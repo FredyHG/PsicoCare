@@ -1,5 +1,6 @@
 package com.fredyhg.psicocare.controllers;
 
+import com.fredyhg.psicocare.controllers.interfaces.TherapyController;
 import com.fredyhg.psicocare.exceptions.ResponseMessage;
 import com.fredyhg.psicocare.models.dtos.TherapyCreateRequest;
 import com.fredyhg.psicocare.services.TherapyService;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/therapy")
 @RequiredArgsConstructor
-public class TherapyController {
+public class TherapyControllerImpl implements TherapyController {
 
     private final TherapyService therapyService;
 

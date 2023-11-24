@@ -25,6 +25,7 @@ public class PatientCreator {
                 .birthDate(LocalDate.now())
                 .lastName("lastName")
                 .name("name")
+                .email("example@email.com")
                 .build();
     }
 }

@@ -1,8 +1,9 @@
 package com.fredyhg.psicocare.controllers;
 
+import com.fredyhg.psicocare.controllers.interfaces.PsychologistController;
 import com.fredyhg.psicocare.exceptions.ResponseMessage;
-import com.fredyhg.psicocare.models.dtos.PatientPostRequest;
-import com.fredyhg.psicocare.services.PatientService;
+import com.fredyhg.psicocare.models.dtos.PsychologistPostRequest;
+import com.fredyhg.psicocare.services.PsychologistService;
 import com.fredyhg.psicocare.utils.Utils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,17 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/patient")
+@RequestMapping("api/psychologist")
 @RequiredArgsConstructor
-public class PatientController {
+public class PsychologistControllerImpl implements PsychologistController {
 
-    private final PatientService patientService;
+    private final PsychologistService psychologistService;
 
     @PostMapping
-    public ResponseEntity<ResponseMessage> createPatient(@RequestBody @Valid PatientPostRequest patientPostRequest){
-        patientService.createPatient(patientPostRequest);
+    @Override
+    public ResponseEntity<ResponseMessage> createPsychologist(@RequestBody @Valid PsychologistPostRequest psychologistPostRequest){
+        psychologistService.createPsychologist(psychologistPostRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(Utils.createResponseMessage("Success",
                 201,
-                "Patient created successfully"));
+                "Psychologist created successfully"));
     }
 }
