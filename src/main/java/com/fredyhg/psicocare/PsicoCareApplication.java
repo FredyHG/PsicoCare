@@ -9,8 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@OpenAPIDefinition(info = @Info(title = "PsicoCare API", version = "1.0", description = "EndPoints Information"))
-@SecurityScheme(name = "bearer", scheme = "bearer", bearerFormat = "JWT",type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER, paramName = "Bearer")
+@OpenAPIDefinition(info = @Info(title = "PsicoCare API", version = "0.1", description = "Routes documentations"))
 public class PsicoCareApplication {
 
 	public static void main(String[] args) {

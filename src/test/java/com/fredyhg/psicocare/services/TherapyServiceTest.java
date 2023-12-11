@@ -1,8 +1,8 @@
 package com.fredyhg.psicocare.services;
 
 
+import com.fredyhg.psicocare.enums.StatusTherapy;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyNotFound;
-import com.fredyhg.psicocare.models.dtos.TherapyCreateRequest;
 import com.fredyhg.psicocare.repositories.TherapyRepository;
 import com.fredyhg.psicocare.utils.PatientCreator;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
@@ -32,6 +32,9 @@ class TherapyServiceTest {
     @Mock
     private PsychologistService psychologistService;
 
+    @Mock
+    private EmailSenderService emailSenderService;
+
     @InjectMocks
     private TherapyService therapyService;
 
@@ -46,7 +49,7 @@ class TherapyServiceTest {
         var psychologistModel = PsychologistCreator.createValidPsychologist();
         when(psychologistService.ensurePsychologistByCrpExists(therapyCreateRequest.getCrpPsychologist())).thenReturn(psychologistModel);
 
-        when(therapyRepository.findByPatientAndPsychologist(patientModel, psychologistModel)).thenReturn(Optional.empty());
+        when(therapyRepository.findByPatientAndPsychologistAndStatusIs(patientModel, psychologistModel, StatusTherapy.WAIT_DATE)).thenReturn(Optional.empty());
 
         therapyService.createTherapy(therapyCreateRequest);
 
@@ -60,7 +63,7 @@ class TherapyServiceTest {
 
         var existingTherapy = TherapyCreator.createValidTherapy();
 
-        when(therapyRepository.findByPatientAndPsychologist(patientModel, psychologistModel)).thenReturn(java.util.Optional.of(existingTherapy));
+        when(therapyRepository.findByPatientAndPsychologistAndStatusIs(patientModel, psychologistModel, StatusTherapy.WAIT_DATE)).thenReturn(java.util.Optional.of(existingTherapy));
 
         assertThrows(TherapyNotFound.class, () -> therapyService.ensureTherapyNonExistsWithStatusWaitDate(patientModel, psychologistModel));
     }
@@ -71,7 +74,7 @@ class TherapyServiceTest {
         var patientModel = PatientCreator.createValidPatient();
         var psychologistModel = PsychologistCreator.createValidPsychologist();
 
-        when(therapyRepository.findByPatientAndPsychologist(patientModel, psychologistModel)).thenReturn(java.util.Optional.empty());
+        when(therapyRepository.findByPatientAndPsychologistAndStatusIs(patientModel, psychologistModel, StatusTherapy.WAIT_DATE)).thenReturn(java.util.Optional.empty());
 
         therapyService.ensureTherapyNonExistsWithStatusWaitDate(patientModel, psychologistModel);
 

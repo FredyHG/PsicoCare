@@ -5,14 +5,18 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PatientPostRequest {
 
     @Size(min = 3, max = 50)
@@ -37,4 +41,5 @@ public class PatientPostRequest {
     @Pattern(regexp = "^\\(\\d{2}\\)\\d{5}-\\d{4}$", message = "Invalid parameters in phone")
     @NotBlank
     private String phone;
+
 }

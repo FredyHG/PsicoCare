@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
 import java.util.UUID;
 
 @Data
@@ -25,16 +27,16 @@ public class TherapyModel {
     @ManyToOne
     @JoinTable(
             name = "therapy_patient",
-            joinColumns = @JoinColumn(name = "patient_id"),
-            inverseJoinColumns = @JoinColumn(name = "therapy_id")
+            joinColumns = @JoinColumn(name = "therapy_id"),
+            inverseJoinColumns = @JoinColumn(name = "patient_id")
     )
     private PatientModel patient;
 
     @ManyToOne
     @JoinTable(
             name = "therapy_psychologist",
-            joinColumns = @JoinColumn(name = "psychologist_id"),
-            inverseJoinColumns = @JoinColumn(name = "therapy_id")
+            joinColumns = @JoinColumn(name = "therapy_id"),
+            inverseJoinColumns = @JoinColumn(name = "psychologist_id")
     )
     private PsychologistModel psychologist;
 
@@ -50,4 +52,21 @@ public class TherapyModel {
     public boolean isValidStatusForCancel(TherapyModel therapyModel){
         return therapyModel.getStatus() == StatusTherapy.WAIT_DATE;
     }
+
+    public boolean isValidDateForSchedule(TherapyModel therapyModel){
+        var now = LocalDateTime.now();
+        var tomorrow = now.plus(Period.ofDays(1));
+
+        var therapyDate = therapyModel.getDate();
+
+        boolean isBeforeTomorrow = therapyDate.isBefore(tomorrow);
+
+        var startTime = LocalTime.of(7, 0);
+        var endTime = LocalTime.of(18, 0);
+
+        return isBeforeTomorrow ||
+                therapyDate.toLocalTime().isBefore(startTime) ||
+                therapyDate.toLocalTime().isAfter(endTime);
+    }
+
 }

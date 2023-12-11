@@ -12,7 +12,7 @@ public class TherapyCreator {
         return TherapyModel.builder()
                 .createAt(LocalDateTime.now())
                 .status(StatusTherapy.WAIT_DATE)
-                .date(LocalDateTime.now())
+                .date(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
                 .psychologist(PsychologistCreator.createValidPsychologist())
                 .patient(PatientCreator.createValidPatient())
                 .build();
@@ -22,7 +22,7 @@ public class TherapyCreator {
         return TherapyCreateRequest.builder()
                 .crpPsychologist("123123")
                 .cpfPatient("12121")
-                .date(LocalDateTime.now())
+                .date(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
                 .build();
     }
 

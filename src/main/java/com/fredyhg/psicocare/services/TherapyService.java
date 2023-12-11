@@ -1,6 +1,7 @@
 package com.fredyhg.psicocare.services;
 
 import com.fredyhg.psicocare.enums.StatusTherapy;
+import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidDates;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyNotFound;
 import com.fredyhg.psicocare.models.PatientModel;
 import com.fredyhg.psicocare.models.PsychologistModel;
@@ -22,6 +23,8 @@ public class TherapyService {
 
     private final PsychologistService psychologistService;
 
+    private final EmailSenderService emailSenderService;
+
     @Transactional
     public void createTherapy(TherapyCreateRequest therapyCreateRequest){
 
@@ -33,19 +36,27 @@ public class TherapyService {
 
         var therapyToBeSaved = ModelMappers.therapyCreateRequestToTherapyModel(therapyCreateRequest, patientModel, psychologistModel);
 
-        therapyRepository.save(therapyToBeSaved);
+        ensureTherapyDatesIsValid(therapyToBeSaved);
+
+        TherapyModel therapyModel = therapyRepository.save(therapyToBeSaved);
+
+        emailSenderService.sendEmail(patientModel, psychologistModel, therapyModel);
     }
 
     private TherapyModel ensureTherapyExists(PatientModel patient, PsychologistModel psychologist){
-        return therapyRepository.findByPatientAndPsychologist(patient, psychologist).orElseThrow(
+        return therapyRepository.findByPatientAndPsychologistAndStatusIs(patient, psychologist, StatusTherapy.WAIT_DATE).orElseThrow(
                 () -> new TherapyNotFound("Therapy not found"));
     }
 
     public void ensureTherapyNonExistsWithStatusWaitDate(PatientModel patient, PsychologistModel psychologist){
-        therapyRepository.findByPatientAndPsychologist(patient, psychologist).ifPresent(the -> {
-            if(the.getStatus() == StatusTherapy.WAIT_DATE){
-                throw new TherapyNotFound("Cannot schedule another therapy with a pending one");
-            }
+        therapyRepository.findByPatientAndPsychologistAndStatusIs(patient, psychologist, StatusTherapy.WAIT_DATE).ifPresent(the -> {
+            throw new TherapyNotFound("Cannot schedule another therapy with a pending one");
         });
+    }
+
+    public void ensureTherapyDatesIsValid(TherapyModel therapyModel){
+        if(therapyModel.isValidDateForSchedule(therapyModel)){
+            throw new TherapyInvalidDates("Schedule date time invalid");
+        }
     }
 }

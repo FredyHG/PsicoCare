@@ -5,7 +5,6 @@ import com.fredyhg.psicocare.exceptions.psychologist.PsychologistNotFound;
 import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.repositories.PsychologistRepository;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
-import org.hibernate.service.spi.InjectService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

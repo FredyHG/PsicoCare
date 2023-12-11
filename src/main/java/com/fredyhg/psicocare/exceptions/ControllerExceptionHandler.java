@@ -5,6 +5,7 @@ import com.fredyhg.psicocare.exceptions.patient.PatientNotFound;
 import com.fredyhg.psicocare.exceptions.psychologist.PsychologistAlreadyRegistered;
 import com.fredyhg.psicocare.exceptions.psychologist.PsychologistNotFound;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyAlreadyExists;
+import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidDates;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +51,18 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(TherapyAlreadyExists.class)
     @ResponseStatus(value = HttpStatus.CONFLICT)
     public ResponseMessage therapyAlreadyRegistered(Exception ex, WebRequest request){
+        return createNewErrorMessage(ex, request, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ErrorToParseEmailInfos.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ResponseMessage errorToParseEmailInfos(Exception ex, WebRequest request){
+        return createNewErrorMessage(ex, request, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(TherapyInvalidDates.class)
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    public ResponseMessage therapyInvalidDate(Exception ex, WebRequest request){
         return createNewErrorMessage(ex, request, HttpStatus.CONFLICT);
     }
 

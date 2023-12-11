@@ -38,4 +38,8 @@ public class PatientService {
         });
 
     }
+
+    public void ensurePatientHasValidAge(PatientPostRequest patientPostRequest){
+
+    }
 }

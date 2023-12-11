@@ -1,11 +1,32 @@
-version: '3'
+version: '2.4'
+x-database-variables: &database-variable
+  SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/psicocare
+  SPRING_DATASOURCE_USERNAME: admin
+  SPRING_DATASOURCE_PASSWORD: admin
 services:
-  postgres:
-    image: postgres:latest
+  db:
+    image: postgres
+    container_name: db
     environment:
       POSTGRES_DB: psicocare
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
+    volumes:
+      - devfredy_data:/var/lib/postgresql
+    mem_limit: 512m
+  app:
+    build: .
+    container_name: psicocare
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *database-variable
+    mem_limit: 512m
+    depends_on:
+      - db
+volumes:
+  devfredy_data:
+
 
