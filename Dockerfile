@@ -1,10 +1,15 @@
-FROM gradle:latest
+FROM ubuntu:latest AS build
 
-WORKDIR /app
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
+COPY . .
 
-COPY build.gradle.kts .
-RUN gradle build --no-daemon || echo "Gradle build failed!"
+RUN ./gradlew clean build
 
-ADD . .
+FROM openjdk:17-jdk-slim
 
-ENTRYPOINT ["gradle", "run"]
+EXPOSE 8080
+
+COPY --from=build /app/build/libs/deploy_render-1.0.0.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
