@@ -23,3 +23,11 @@ jobs:
         run: docker build -t dracarys22/deploy_psicocare .
       - name: Push image docker
         run: docker push dracarys22/deploy_psicocare
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull ima from docker hub
+        run: docker pull dracarys22/deploy_psicocare:latest
+      - name: Run docker container
+        run: docker run -d -p 8080:8080 --name deploy_psicocare dracarys22/deploy_psicocare:latest
