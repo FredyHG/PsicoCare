@@ -30,4 +30,9 @@ jobs:
       - name: Pull ima from docker hub
         run: docker pull dracarys22/deploy_psicocare:latest
       - name: Run docker container
-        run: docker run -d -p 8080:8080 -e DB_USERNAME=${{secrets.DB_USERNAME}} -e DB_PASSWORD=${{secrets.DB_PASSWORD}} -e POSTGRES_URL=${{secrets.POSTGRES_URL}} -e MAIL_USERNAME=${{secrets.MAIL_USERNAME}} -e MAIL_PASSWORD=${{secrets.MAIL_PASSWORD}} --name deploy_psicocare dracarys22/deploy_psicocare:latest
+        run: docker run -d -p 8080:8080 \ 
+          -e DB_USERNAME=${{secrets.DB_USERNAME}} \
+          -e DB_PASSWORD=${{secrets.DB_PASSWORD}} -e POSTGRES_URL=${{secrets.POSTGRES_URL}} \
+          -e MAIL_USERNAME=${{secrets.MAIL_USERNAME}} \
+          -e MAIL_PASSWORD=${{secrets.MAIL_PASSWORD}} \
+          --name deploy_psicocare dracarys22/deploy_psicocare:latest
