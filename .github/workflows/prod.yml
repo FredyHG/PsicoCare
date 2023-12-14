@@ -27,7 +27,7 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - name: Pull ima from docker hub
+      - name: Pull image from docker hub
         run: docker pull dracarys22/deploy_psicocare:latest
       - name: Run docker container
         run: docker run -d -p 8080:8080 \
@@ -35,5 +35,5 @@ jobs:
             -e DB_PASSWORD=${{secrets.DB_PASSWORD}} \
             -e POSTGRES_URL=${{secrets.POSTGRES_URL}} \
             -e MAIL_USERNAME=${{secrets.MAIL_USERNAME}}  \
-            -e MAIL_PASSWORD=${{secrets.MAIL_PASSWORD}}\
+            -e MAIL_PASSWORD=${{secrets.MAIL_PASSWORD}} \
             --name deploy_psicocare dracarys22/deploy_psicocare:latest
