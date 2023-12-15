@@ -15,8 +15,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+      - name: Run tests
+        run: ./gradlew test
       - name: Build project
-        run: ./gradlew clean build
+        run: ./gradlew clean assemble
       - name: Login Docker Hub
         run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Build docker image

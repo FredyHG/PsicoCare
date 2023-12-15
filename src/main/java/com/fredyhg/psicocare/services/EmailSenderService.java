@@ -35,7 +35,7 @@ public class EmailSenderService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(patientModel.getEmail());
-            helper.setSubject("Agendamento Confirmado");
+            helper.setSubject("Appointment Confirmed");
 
             ClassPathResource resource = new ClassPathResource("static/email-template.html");
             String emailContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
