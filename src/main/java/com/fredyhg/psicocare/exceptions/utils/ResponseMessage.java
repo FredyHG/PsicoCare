@@ -1,4 +1,4 @@
-package com.fredyhg.psicocare.exceptions;
+package com.fredyhg.psicocare.exceptions.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

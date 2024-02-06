@@ -44,20 +44,28 @@ public class TherapyModel {
     private StatusTherapy status;
 
     @Column(name = "date")
-    private LocalDateTime date;
+    private LocalDateTime dateTime;
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
-    public boolean isValidStatusForCancel(TherapyModel therapyModel){
-        return therapyModel.getStatus() == StatusTherapy.WAIT_DATE;
+    public boolean isValidStatusForChange(TherapyModel therapyModel){
+        return therapyModel.getStatus() == StatusTherapy.FINISH;
+    }
+
+    public boolean isValidStatusForConfirm(TherapyModel therapyModel){
+        return therapyModel.getStatus() == StatusTherapy.WAIT_CONFIRMATION;
+    }
+
+    public boolean isValidForCancel(TherapyModel therapyModel){
+        return therapyModel.getStatus() == StatusTherapy.WAIT_CONFIRMATION || therapyModel.getStatus() == StatusTherapy.WAIT_DATE;
     }
 
     public boolean isValidDateForSchedule(TherapyModel therapyModel){
         var now = LocalDateTime.now();
         var tomorrow = now.plus(Period.ofDays(1));
 
-        var therapyDate = therapyModel.getDate();
+        var therapyDate = therapyModel.getDateTime();
 
         boolean isBeforeTomorrow = therapyDate.isBefore(tomorrow);
 
@@ -68,5 +76,4 @@ public class TherapyModel {
                 therapyDate.toLocalTime().isBefore(startTime) ||
                 therapyDate.toLocalTime().isAfter(endTime);
     }
-
 }

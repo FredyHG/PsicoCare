@@ -1,4 +1,4 @@
-package com.fredyhg.psicocare.models.dtos;
+package com.fredyhg.psicocare.models.dtos.patient;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
@@ -41,5 +41,4 @@ public class PatientPostRequest {
     @Pattern(regexp = "^\\(\\d{2}\\)\\d{5}-\\d{4}$", message = "Invalid parameters in phone")
     @NotBlank
     private String phone;
-
 }

@@ -1,5 +1,6 @@
 package com.fredyhg.psicocare.models;
 
+import com.fredyhg.psicocare.security.models.UserModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,4 +39,5 @@ public class PsychologistModel {
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
 }

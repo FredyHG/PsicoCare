@@ -28,15 +28,24 @@ class EmailSenderServiceTest {
 
     @Test
     void testSendEmail() {
-
-        PatientModel patientModel = PatientCreator.createValidPatient();
-        PsychologistModel psychologist = PsychologistCreator.createValidPsychologist();
         TherapyModel therapyModel = TherapyCreator.createValidTherapy();
 
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
 
-        emailService.sendEmail(patientModel, psychologist, therapyModel);
+        emailService.sendEmail(therapyModel);
+
+        verify(mailSender).send(mimeMessage);
+    }
+
+    @Test
+    void testSendAccessDetailsEmail() {
+        PsychologistModel validPsychologist = PsychologistCreator.createValidPsychologist();
+
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        emailService.sendAccessDetailsEmail(validPsychologist, "Password");
 
         verify(mailSender).send(mimeMessage);
     }

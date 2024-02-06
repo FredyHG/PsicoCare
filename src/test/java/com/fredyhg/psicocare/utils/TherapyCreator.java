@@ -2,7 +2,8 @@ package com.fredyhg.psicocare.utils;
 
 import com.fredyhg.psicocare.enums.StatusTherapy;
 import com.fredyhg.psicocare.models.TherapyModel;
-import com.fredyhg.psicocare.models.dtos.TherapyCreateRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.SchedulePutRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.TherapyCreateRequest;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,27 @@ public class TherapyCreator {
         return TherapyModel.builder()
                 .createAt(LocalDateTime.now())
                 .status(StatusTherapy.WAIT_DATE)
-                .date(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
+                .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
+                .psychologist(PsychologistCreator.createValidPsychologist())
+                .patient(PatientCreator.createValidPatient())
+                .build();
+    }
+
+    public static TherapyModel createInvalidTherapy(){
+        return TherapyModel.builder()
+                .createAt(LocalDateTime.now())
+                .status(StatusTherapy.FINISH)
+                .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
+                .psychologist(PsychologistCreator.createValidPsychologist())
+                .patient(PatientCreator.createValidPatient())
+                .build();
+    }
+
+    public static TherapyModel createValidTherapyWithStatusWaitConfirmation(){
+        return TherapyModel.builder()
+                .createAt(LocalDateTime.now())
+                .status(StatusTherapy.WAIT_CONFIRMATION)
+                .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
                 .psychologist(PsychologistCreator.createValidPsychologist())
                 .patient(PatientCreator.createValidPatient())
                 .build();
@@ -22,8 +43,24 @@ public class TherapyCreator {
         return TherapyCreateRequest.builder()
                 .crpPsychologist("123123")
                 .cpfPatient("12121")
-                .date(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
+                .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
                 .build();
     }
 
+    public static TherapyModel createValidTherapyWithStatusWait_Confirmation() {
+        return TherapyModel.builder()
+                .createAt(LocalDateTime.now())
+                .status(StatusTherapy.WAIT_CONFIRMATION)
+                .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))
+                .psychologist(PsychologistCreator.createValidPsychologist())
+                .patient(PatientCreator.createValidPatient())
+                .build();
+    }
+
+    public static SchedulePutRequest createValidSchedulePutRequest(){
+        return SchedulePutRequest.builder()
+                .patientCPF("123456")
+                .psychologistCRP("1234")
+                .build();
+    }
 }
