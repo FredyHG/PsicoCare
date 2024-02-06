@@ -1,5 +1,6 @@
-package com.fredyhg.psicocare.models.dtos;
+package com.fredyhg.psicocare.models.dtos.therapy;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,11 +10,10 @@ import java.time.LocalDateTime;
 @Builder
 public class TherapyCreateRequest {
 
-
     private String crpPsychologist;
 
     private String cpfPatient;
 
-    private LocalDateTime date;
-
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dateTime;
 }

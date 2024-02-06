@@ -1,9 +1,11 @@
 package com.fredyhg.psicocare.utils;
 
+import com.fredyhg.psicocare.models.PatientModel;
 import com.fredyhg.psicocare.models.PsychologistModel;
-import com.fredyhg.psicocare.models.dtos.PsychologistPostRequest;
+import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistPostRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PsychologistCreator {
 
@@ -26,6 +28,10 @@ public class PsychologistCreator {
                 .name("name")
                 .lastName("lastName")
                 .build();
+    }
+
+    public static List<PsychologistModel> createValidListOfPsychologist(){
+        return List.of(createValidPsychologist());
     }
 
 }

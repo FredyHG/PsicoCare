@@ -1,21 +1,33 @@
 package com.fredyhg.psicocare.services;
 
-import com.fredyhg.psicocare.exceptions.patient.PatientAlreadyRegistered;
+import com.fredyhg.psicocare.exceptions.patient.PatientAlreadyRegisteredException;
+import com.fredyhg.psicocare.exceptions.patient.PatientNotFoundException;
 import com.fredyhg.psicocare.models.PatientModel;
+import com.fredyhg.psicocare.models.dtos.patient.PatientGetRequest;
+import com.fredyhg.psicocare.models.dtos.patient.PatientPutRequest;
 import com.fredyhg.psicocare.repositories.PatientRepository;
 import com.fredyhg.psicocare.utils.PatientCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PatientServiceTest {
@@ -25,58 +37,185 @@ class PatientServiceTest {
     @InjectMocks
     private PatientService patientService;
 
+
+
     @Test
-    public void testCreatePatient() {
+    void testCreatePatient() {
         var patientPostRequest = PatientCreator.createValidPatientPostRequest();
 
-        when(patientRepository.findByCpf(Mockito.anyString())).thenReturn(Optional.empty());
-        when(patientRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.empty());
+        when(patientRepository.findByCpf(anyString())).thenReturn(Optional.empty());
+        when(patientRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         patientService.createPatient(patientPostRequest);
 
-        verify(patientRepository, Mockito.times(1)).save(Mockito.any());
+        verify(patientRepository, Mockito.times(1)).save(any());
     }
 
     @Test
-    public void testEnsurePatientByCPFExists() {
+    void testEnsurePatientByCPFExists() {
         String cpf = "123456789";
         var patientModel = PatientCreator.createValidPatient();
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.of(patientModel));
 
         PatientModel result = patientService.ensurePatientByCPFExists(cpf);
-        assert(result.equals(patientModel));
+        assertEquals(result, patientModel);
     }
 
     @Test
-    public void testEnsurePatientByEmailOrCpfNonExists() {
+    void testEnsurePatientByEmailOrCpfNonExists() {
         String cpf = "123456789";
         String email = "john@example.com";
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.empty());
         when(patientRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        patientService.ensurePatientByEmailOrCpfNonExists(email, cpf);
+        assertDoesNotThrow(() -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
 
     @Test
-    public void testEnsurePatientByEmailOrCpfNonExists_WithExistingCpf() {
+    void testEnsurePatientByEmailOrCpfNonExists_WithExistingCpf() {
         String cpf = "123456789";
         String email = "john@example.com";
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.of(new PatientModel()));
 
-        assertThrows(PatientAlreadyRegistered.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
+        assertThrows(PatientAlreadyRegisteredException.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
 
     @Test
-    public void testEnsurePatientByEmailOrCpfNonExists_WithExistingEmail() {
+    void testEnsurePatientByEmailOrCpfNonExists_WithExistingEmail() {
         String cpf = "123456789";
         String email = "john@example.com";
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.empty());
         when(patientRepository.findByEmail(email)).thenReturn(Optional.of(new PatientModel()));
 
-        assertThrows(PatientAlreadyRegistered.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
+        assertThrows(PatientAlreadyRegisteredException.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
+
+    @Test
+    void testGetPatients(){
+        Pageable pageable = PageRequest.of(0, 10);
+        List<PatientModel> patientModelList = PatientCreator.createValidListOfPatients();
+        Page<PatientModel> patientModelPage = new PageImpl<>(patientModelList, pageable, patientModelList.size());
+
+        when(patientRepository.findAll(pageable)).thenReturn(patientModelPage);
+
+        Page<PatientGetRequest> result = patientService.getPatients(pageable);
+
+        assertNotNull(result);
+        assertEquals(patientModelList.size(), result.getContent().size());
+
+        verify(patientRepository).findAll(pageable);
+    }
+
+    @Test
+    void testEditPatientInfos_SuccessfulUpdate() {
+        when(patientRepository.findByCpf(anyString())).thenReturn(Optional.of(PatientCreator.createValidPatient()));
+
+        patientService.editPatientInfos(PatientCreator.createValidPatientPutRequest());
+
+        verify(patientRepository).save(any(PatientModel.class));
+    }
+
+    @Test
+    void testEditPatientInfos_PatientNotFound() {
+        when(patientRepository.findByCpf(anyString())).thenReturn(Optional.empty());
+
+        PatientPutRequest validPatientPutRequest = PatientCreator.createValidPatientPutRequest();
+
+        assertThrows(PatientNotFoundException.class, () -> patientService.editPatientInfos(validPatientPutRequest));
+    }
+
+    @Test
+    void testEditPatientInfos_PartialUpdate() {
+        ArgumentCaptor<PatientModel> patientModelCaptor = ArgumentCaptor.forClass(PatientModel.class);
+
+        when(patientRepository.findByCpf(anyString())).thenReturn(Optional.of(PatientCreator.createValidPatient()));
+
+        PatientPutRequest patientPutRequest = PatientCreator.createValidPatientPutRequest();
+        patientPutRequest.setName(Optional.of("New Name"));
+
+        patientService.editPatientInfos(patientPutRequest);
+
+        verify(patientRepository).save(patientModelCaptor.capture());
+        assertEquals("New Name", patientModelCaptor.getValue().getName());}
+
+    @Test
+    void testEditPatientInfos_InvalidDate() {
+        ArgumentCaptor<PatientModel> patientModelCaptor = ArgumentCaptor.forClass(PatientModel.class);
+
+        when(patientRepository.findByCpf(anyString())).thenReturn(Optional.of(PatientCreator.createValidPatient()));
+
+        PatientPutRequest patientPutRequest = PatientCreator.createValidPatientPutRequest();
+
+        patientPutRequest.setBirthDate(Optional.of(LocalDate.now().minusYears(3)));
+
+        patientService.editPatientInfos(patientPutRequest);
+
+        verify(patientRepository).save(patientModelCaptor.capture());
+        assertNotEquals(LocalDate.now().minusYears(3), patientModelCaptor.getValue().getBirthDate());
+    }
+
+    @Test
+    void testGetPatientsFiltered_AllParametersPresent() {
+        Page<PatientModel> mockedPage = new PageImpl<>(Collections.singletonList(new PatientModel()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        when(patientRepository.findAllFiltered("John", "Doe", "12345678900", "john@example.com", pageRequest))
+                .thenReturn(mockedPage);
+
+        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+                Optional.of("John"), Optional.of("Doe"), Optional.of("12345678900"), Optional.of("john@example.com"), PageRequest.of(0, 10));
+
+        assertNotNull(result);
+        verify(patientRepository).findAllFiltered("John", "Doe", "12345678900", "john@example.com", PageRequest.of(0, 10));
+    }
+
+    @Test
+    void testGetPatientsFiltered_SomeParametersAbsent() {
+        Page<PatientModel> mockedPage = new PageImpl<>(Collections.singletonList(new PatientModel()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        when(patientRepository.findAllFiltered("John", null, "12345678900", null, pageRequest))
+                .thenReturn(mockedPage);
+
+
+        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+                Optional.of("John"), Optional.empty(), Optional.of("12345678900"), Optional.empty(), PageRequest.of(0, 10));
+
+        assertNotNull(result);
+        verify(patientRepository).findAllFiltered("John", null, "12345678900", null, PageRequest.of(0, 10));
+    }
+
+    @Test
+    void testGetPatientsFiltered_AllParametersAbsent() {
+        Page<PatientModel> mockedPage = new PageImpl<>(Collections.singletonList(new PatientModel()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        when(patientRepository.findAllFiltered(null, null, null, null, pageRequest))
+                .thenReturn(mockedPage);
+
+        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), PageRequest.of(0, 10));
+
+        assertNotNull(result);
+        verify(patientRepository).findAllFiltered(null, null, null, null, PageRequest.of(0, 10));
+    }
+
+    @Test
+    void testGetPatientsFiltered_PageableParameter() {
+        Page<PatientModel> mockedPage = new PageImpl<>(Collections.singletonList(new PatientModel()));
+
+        when(patientRepository.findAllFiltered(null, null, null, null, PageRequest.of(1, 5)))
+                .thenReturn(mockedPage);
+
+        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), PageRequest.of(1, 5));
+
+        assertNotNull(result);
+        verify(patientRepository).findAllFiltered(null, null, null, null, PageRequest.of(1, 5));
+    }
+
+
 }

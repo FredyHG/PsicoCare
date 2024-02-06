@@ -1,7 +1,6 @@
 package com.fredyhg.psicocare.services;
 
-import com.fredyhg.psicocare.exceptions.ErrorToParseEmailInfos;
-import com.fredyhg.psicocare.models.PatientModel;
+import com.fredyhg.psicocare.exceptions.utils.ParseEmailInfosException;
 import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.models.TherapyModel;
 import jakarta.mail.MessagingException;
@@ -19,40 +18,65 @@ import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
 
-
 @Service
 @RequiredArgsConstructor
 public class EmailSenderService {
 
     private final JavaMailSender mailSender;
 
-    public void sendEmail(PatientModel patientModel, PsychologistModel psychologist, TherapyModel therapyModel) {
+    public void sendEmail(TherapyModel therapyModel) {
         MimeMessage message = mailSender.createMimeMessage();
 
-        String dateFormatted = extractDataFromLocalDateTime(therapyModel.getDate());
-        String hourFormatted = extractHourFromLocalDateTime(therapyModel.getDate());
+        String dateFormatted = extractDataFromLocalDateTime(therapyModel.getDateTime());
+        String hourFormatted = extractHourFromLocalDateTime(therapyModel.getDateTime());
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setTo(patientModel.getEmail());
+            helper.setTo(therapyModel.getPatient().getEmail());
             helper.setSubject("Appointment Confirmed");
 
             ClassPathResource resource = new ClassPathResource("static/email-template.html");
             String emailContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
 
-            emailContent = emailContent.replace("{patientName}", patientModel.getName());
-            emailContent = emailContent.replace("{psychologistName}", psychologist.getName());
+            emailContent = emailContent.replace("{patientName}", therapyModel.getPatient().getName());
+            emailContent = emailContent.replace("{psychologistName}", therapyModel.getPsychologist().getName());
             emailContent = emailContent.replace("{dateFormatted}", dateFormatted);
             emailContent = emailContent.replace("{hourFormatted}", hourFormatted);
 
             helper.setText(emailContent, true);
             helper.setFrom("PsicoCare <example@example.com>");
         } catch (IOException | MessagingException ex) {
-            throw new ErrorToParseEmailInfos("Error to parse email infos");
+            throw new ParseEmailInfosException("Error to parse email infos");
         }
 
         mailSender.send(message);
     }
+
+    public void sendAccessDetailsEmail(PsychologistModel psychologistModel, String password) {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(psychologistModel.getEmail());
+            helper.setSubject("Access Details");
+
+            ClassPathResource resource = new ClassPathResource("static/access-details.html");
+            String emailContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+
+            emailContent = emailContent.replace("{psychologistName}", psychologistModel.getName());
+            emailContent = emailContent.replace("{username}", psychologistModel.getEmail());
+            emailContent = emailContent.replace("{password}", password);
+
+            helper.setText(emailContent, true);
+            helper.setFrom("PsicoCare <example@example.com>");
+        } catch (IOException | MessagingException ex) {
+            throw new ParseEmailInfosException("Error to parse email infos");
+        }
+
+        mailSender.send(message);
+    }
+
+
 
     public String extractDataFromLocalDateTime(LocalDateTime localDateTime){
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");

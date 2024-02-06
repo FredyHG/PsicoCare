@@ -1,4 +1,4 @@
-package com.fredyhg.psicocare.models.dtos;
+package com.fredyhg.psicocare.models.dtos.psychologist;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
