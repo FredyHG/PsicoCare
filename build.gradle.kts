@@ -76,11 +76,11 @@ tasks.jacocoTestReport {
 	}
 }
 
-val properties = Properties()
-file("local.properties").inputStream().use {
-	properties.load(it)
-}
-val sonarKey = properties.getProperty("SONAR_KEY")
+//val properties = Properties()
+//file("local.properties").inputStream().use {
+//	properties.load(it)
+//}
+//val sonarKey = properties.getProperty("SONAR_KEY")
 
 
 //sonarqube {
