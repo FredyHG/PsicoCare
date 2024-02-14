@@ -48,7 +48,7 @@ public class PsychologistService {
         });
     }
 
-    public Page<PsychologistGetRequest> getAllPsychologists(Pageable pageable) {
+    public Page<PsychologistGetRequest> getAllPsychologistsPageable(Pageable pageable) {
 
         Page<PsychologistModel> psychologistsPageable = psychologistRepository.findAll(pageable);
 
@@ -57,6 +57,10 @@ public class PsychologistService {
                 .toList();
 
         return new PageImpl<>(listOfPsychologist);
+    }
+
+    public List<PsychologistModel> getAllPsychologists(){
+        return psychologistRepository.findAll();
     }
 
 

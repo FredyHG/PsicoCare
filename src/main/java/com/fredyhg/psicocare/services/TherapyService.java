@@ -22,11 +22,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -119,6 +122,22 @@ public class TherapyService {
         List<TherapyGetRequest> listOfTherapyGet = this.convertToTherapyGetRequests(therapyPageable);
 
         return new PageImpl<>(listOfTherapyGet);
+    }
+
+    @Scheduled(cron = "0 0 6 * * ?")
+    public void getTodaySchedules(){
+
+        LocalDateTime maxDate = LocalDateTime.now().plusHours(16);
+
+
+        psychologistService.getAllPsychologists().forEach(psy -> {
+            List<TherapyModel> sessions = therapyRepository.findAllByPsychologistAndMinDateMaxDate(psy.getId(), LocalDateTime.now(), maxDate);
+
+            if(!sessions.isEmpty()){
+                emailSenderService.schedulesDates(psy, sessions);
+            }
+        });
+
     }
 
     public Page<TherapyGetRequest> getAllTherapiesFinished(Pageable pageable){
