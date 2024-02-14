@@ -33,6 +33,6 @@ public class PsychologistControllerImpl implements PsychologistController {
     @GetMapping
     @Override
     public ResponseEntity<Page<PsychologistGetRequest>> getAllPsychologists(Pageable pageable){
-        return ResponseEntity.status(HttpStatus.OK).body(psychologistService.getAllPsychologists(pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(psychologistService.getAllPsychologistsPageable(pageable));
     }
 }

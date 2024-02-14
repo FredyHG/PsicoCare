@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +67,40 @@ public class EmailSenderService {
             emailContent = emailContent.replace("{psychologistName}", psychologistModel.getName());
             emailContent = emailContent.replace("{username}", psychologistModel.getEmail());
             emailContent = emailContent.replace("{password}", password);
+
+            helper.setText(emailContent, true);
+            helper.setFrom("PsicoCare <example@example.com>");
+        } catch (IOException | MessagingException ex) {
+            throw new ParseEmailInfosException("Error to parse email infos");
+        }
+
+        mailSender.send(message);
+    }
+
+    public void schedulesDates(PsychologistModel psychologistModel, List<TherapyModel> sessions){
+
+        StringBuilder therapySessionsHtml = new StringBuilder();
+
+        for(TherapyModel session : sessions){
+            therapySessionsHtml.append("<tr>")
+                    .append("<td>").append(extractHourFromLocalDateTime(session.getDateTime())).append("</td>")
+                    .append("<td>").append(session.getPatient().getName()).append("</td>")
+                    .append("</tr>");
+        }
+
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(psychologistModel.getEmail());
+            System.out.println(psychologistModel.getEmail());
+            helper.setSubject("Today Schedules");
+
+            ClassPathResource resource = new ClassPathResource("static/schedules-template.html");
+            String emailContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+
+            emailContent = emailContent.replace("${therapySessions}", therapySessionsHtml.toString());
 
             helper.setText(emailContent, true);
             helper.setFrom("PsicoCare <example@example.com>");

@@ -3,7 +3,6 @@ package com.fredyhg.psicocare.services;
 import com.fredyhg.psicocare.exceptions.psychologist.PsychologistAlreadyRegisteredException;
 import com.fredyhg.psicocare.exceptions.psychologist.PsychologistNotFoundException;
 import com.fredyhg.psicocare.models.PsychologistModel;
-import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistGetRequest;
 import com.fredyhg.psicocare.repositories.PsychologistRepository;
 import com.fredyhg.psicocare.security.services.UserService;
@@ -76,7 +75,7 @@ class PsychologistServiceTest {
 
         when(psychologistRepository.findAll(pageable)).thenReturn(psychologistModelPage);
 
-        Page<PsychologistGetRequest> result = psychologistService.getAllPsychologists(pageable);
+        Page<PsychologistGetRequest> result = psychologistService.getAllPsychologistsPageable(pageable);
 
         assertNotNull(result);
         assertEquals(psychologistModelList.size(), result.getContent().size());
