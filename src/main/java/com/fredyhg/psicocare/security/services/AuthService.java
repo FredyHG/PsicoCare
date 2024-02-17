@@ -90,8 +90,6 @@ public class AuthService {
            revokeAllUserTokens(account);
            this.userService.saveUserToken(account, accessToken);
 
-            System.out.println("aq");
-
            return AuthenticationResponse
                    .builder()
                    .accessToken(accessToken)
