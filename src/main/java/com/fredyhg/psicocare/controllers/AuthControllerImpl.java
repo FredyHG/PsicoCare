@@ -28,7 +28,7 @@ public class AuthControllerImpl implements AuthController {
 
     @PostMapping("/refresh-token")
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response){
-        authService.refreshToken(request, response);
+    public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response){
+        return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(request, response));
     }
 }

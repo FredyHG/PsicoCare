@@ -25,6 +25,6 @@ public interface AuthController {
             @ApiResponse(responseCode = "400", description = "User credentials error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized request")
     })
-    void refreshToken(HttpServletRequest request, HttpServletResponse response);
+    ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response);
 
 }
