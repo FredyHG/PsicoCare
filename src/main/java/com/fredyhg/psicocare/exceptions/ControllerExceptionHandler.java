@@ -12,6 +12,7 @@ import com.fredyhg.psicocare.exceptions.utils.AgeException;
 import com.fredyhg.psicocare.exceptions.utils.ParseEmailInfosException;
 import com.fredyhg.psicocare.exceptions.utils.ResponseMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -87,6 +88,12 @@ public class ControllerExceptionHandler {
     @ResponseStatus(value = HttpStatus.CONFLICT)
     public ResponseMessage jwtExpired(Exception ex, WebRequest request){
         return this.createNewErrorMessage(ex, request, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
+    public ResponseMessage badCredentials(Exception ex, WebRequest request){
+        return this.createNewErrorMessage(ex, request, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

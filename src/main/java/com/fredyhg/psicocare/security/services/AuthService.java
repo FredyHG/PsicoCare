@@ -70,12 +70,13 @@ public class AuthService {
         userTokenRepository.saveAll(validAccountTokens);
     }
 
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response){
+    public AuthenticationResponse refreshToken(HttpServletRequest request, HttpServletResponse response){
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String accountUsername;
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) return;
+
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) return null;
 
         refreshToken = authHeader.substring(7);
         accountUsername = jwtService.extractUsername(refreshToken);
@@ -89,18 +90,17 @@ public class AuthService {
            revokeAllUserTokens(account);
            this.userService.saveUserToken(account, accessToken);
 
-           AuthenticationResponse authResponse = AuthenticationResponse
+            System.out.println("aq");
+
+           return AuthenticationResponse
                    .builder()
                    .accessToken(accessToken)
                    .refreshToken(refreshToken)
                    .build();
 
-           try {
-               new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
-           } catch (IOException ex){
-               throw new InternalAuthenticationServiceException("Error to parse token");
-           }
         }
+
+        throw new InternalAuthenticationServiceException("Error to parse token");
     }
 
 }
