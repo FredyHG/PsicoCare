@@ -78,12 +78,11 @@ class AuthServiceTest {
         when(jwtService.isTokenValid("validRefreshToken", user)).thenReturn(true);
         when(jwtService.generateToken(user)).thenReturn("newAccessToken");
 
-        ServletOutputStream outputStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outputStream);
 
-        authService.refreshToken(request, response);
+        AuthenticationResponse authenticationResponse = authService.refreshToken(request, response);
 
-        verify(response).getOutputStream();
+        assertEquals(authenticationResponse.getRefreshToken(), "validRefreshToken");
+
     }
 
 }
