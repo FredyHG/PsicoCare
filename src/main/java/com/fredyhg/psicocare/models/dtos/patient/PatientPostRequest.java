@@ -27,7 +27,7 @@ public class PatientPostRequest {
     @Size(min = 3, max = 50)
     private String lastName;
 
-    @JsonFormat(pattern = "dd/MM/yyyy")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate birthDate;
 
     @CPF

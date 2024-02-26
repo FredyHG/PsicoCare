@@ -31,4 +31,10 @@ public class AuthControllerImpl implements AuthController {
     public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response){
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(request, response));
     }
+
+    @PostMapping("/check-login")
+    public ResponseEntity<Boolean> checkLogin(){
+        return ResponseEntity.status(HttpStatus.OK).body(true);
+    }
+
 }

@@ -30,6 +30,7 @@ public class PatientService {
     public void createPatient(PatientPostRequest patientToBeCreate){
 
         this.ensurePatientByEmailOrCpfNonExists(patientToBeCreate.getEmail(), patientToBeCreate.getCpf());
+        System.out.println(patientToBeCreate.getBirthDate());
         this.ensurePatientHasValidAge(patientToBeCreate.getBirthDate());
 
         patientRepository.save(ModelMappers.patientPostRequestToPatientModel(patientToBeCreate));
@@ -53,6 +54,14 @@ public class PatientService {
         PatientModel patientModel = ModelMappers.patientPutRequestToPatientModel(patientPutRequest, patientModelToUpdate);
 
         patientRepository.save(patientModel);
+    }
+
+    @Transactional
+    public void delete(String cpf) {
+
+        PatientModel patient = ensurePatientByCPFExists(cpf);
+
+        patientRepository.delete(patient);
     }
 
     public PatientModel ensurePatientByCPFExists(String cpf){
@@ -86,5 +95,6 @@ public class PatientService {
 
         return new PageImpl<>(listOfPatient);
     }
+
 
 }
