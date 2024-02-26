@@ -24,7 +24,7 @@ public class TherapyModel {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinTable(
             name = "therapy_patient",
             joinColumns = @JoinColumn(name = "therapy_id"),
@@ -32,7 +32,7 @@ public class TherapyModel {
     )
     private PatientModel patient;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinTable(
             name = "therapy_psychologist",
             joinColumns = @JoinColumn(name = "therapy_id"),

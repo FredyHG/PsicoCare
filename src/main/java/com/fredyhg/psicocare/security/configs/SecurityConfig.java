@@ -31,17 +31,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/auth/authenticate", "/api/auth/refresh-token").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/authenticate", "/api/auth/refresh-token").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/psychologist").hasAnyRole("ADMIN")
-                        .anyRequest().hasRole("PSYCHOLOGIST")
+                        .requestMatchers(HttpMethod.GET, "/api/patient", "/api/patient/filter").hasAnyRole("PSYCHOLOGIST")
+                        .requestMatchers(HttpMethod.DELETE, "/api/patient/delete").hasAnyRole("PSYCHOLOGIST")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/check-login", "/api/therapy/schedule", "/api/patient").hasAnyRole("PSYCHOLOGIST", "ROOT")
+                        .requestMatchers(HttpMethod.PUT, "/api/patient").hasAnyRole("PSYCHOLOGIST", "ROOT")
+                        .anyRequest().hasRole("ROOT")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
 

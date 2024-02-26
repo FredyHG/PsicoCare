@@ -62,4 +62,13 @@ public class PatientControllerImpl implements PatientController {
 
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseMessage> deletePatient(@RequestParam String cpf){
+        patientService.delete(cpf);
+        return ResponseEntity.status(HttpStatus.OK).body(Utils.createResponseMessage(
+                200,
+                "Patient deleted successfully"
+        ));
+    }
+
 }

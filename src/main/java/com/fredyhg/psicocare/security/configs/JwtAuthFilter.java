@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isAuthApiRequest(HttpServletRequest request) {
-        return request.getServletPath().contains("/api/auth");
+        return request.getServletPath().contains("/api/auth/authenticate") || request.getServletPath().contains("/api/auth/refresh-token");
     }
 
     private boolean isInvalidAuthHeader(String authHeader) {
