@@ -9,7 +9,7 @@ import com.fredyhg.psicocare.models.dtos.patient.PatientPostRequest;
 import com.fredyhg.psicocare.models.dtos.patient.PatientPutRequest;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistGetRequest;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistPostRequest;
-import com.fredyhg.psicocare.models.dtos.therapy.TherapyCreateRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.TherapyPostRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.TherapyGetRequest;
 import org.springframework.stereotype.Component;
 
@@ -19,17 +19,16 @@ import java.time.LocalDateTime;
 @Component
 public class ModelMappers {
 
-    private ModelMappers() {
+    private ModelMappers(){
     }
-
-    public static TherapyModel therapyCreateRequestToTherapyModel(TherapyCreateRequest therapyCreateRequest,
+    
+    public static TherapyModel therapyCreateRequestToTherapyModel(TherapyPostRequest therapyPostRequest,
                                                                   PatientModel patient,
                                                                   PsychologistModel psychologist){
 
         return TherapyModel.builder()
-                .createAt(LocalDateTime.now())
                 .status(StatusTherapy.WAIT_CONFIRMATION)
-                .dateTime(therapyCreateRequest.getDateTime())
+                .dateTime(therapyPostRequest.getDateTime())
                 .psychologist(psychologist)
                 .patient(patient)
                 .build();
@@ -43,7 +42,6 @@ public class ModelMappers {
                 .phone(patientPostRequest.getPhone())
                 .cpf(patientPostRequest.getCpf())
                 .email(patientPostRequest.getEmail())
-                .createAt(LocalDateTime.now())
                 .build();
     }
 
@@ -54,7 +52,6 @@ public class ModelMappers {
                 .lastName(psychologistPostRequest.getLastName())
                 .phone(psychologistPostRequest.getPhone())
                 .email(psychologistPostRequest.getEmail())
-                .createAt(LocalDateTime.now())
                 .build();
     }
 

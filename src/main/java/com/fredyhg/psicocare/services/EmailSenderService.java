@@ -6,6 +6,7 @@ import com.fredyhg.psicocare.models.TherapyModel;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -24,6 +25,9 @@ import java.util.List;
 public class EmailSenderService {
 
     private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.from-username}")
+    private String emailFrom;
 
     public void sendEmail(TherapyModel therapyModel) {
         MimeMessage message = mailSender.createMimeMessage();
@@ -45,7 +49,7 @@ public class EmailSenderService {
             emailContent = emailContent.replace("{hourFormatted}", hourFormatted);
 
             helper.setText(emailContent, true);
-            helper.setFrom("PsicoCare <example@example.com>");
+            helper.setFrom("PsicoCare <" + emailFrom + ">");
         } catch (IOException | MessagingException ex) {
             throw new ParseEmailInfosException("Error to parse email infos");
         }
@@ -61,7 +65,7 @@ public class EmailSenderService {
             helper.setTo(psychologistModel.getEmail());
             helper.setSubject("Access Details");
 
-            ClassPathResource resource = new ClassPathResource("static/access-details.html");
+            ClassPathResource resource = new ClassPathResource("static/access-details-template.html");
             String emailContent = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
 
             emailContent = emailContent.replace("{psychologistName}", psychologistModel.getName());
@@ -69,7 +73,7 @@ public class EmailSenderService {
             emailContent = emailContent.replace("{password}", password);
 
             helper.setText(emailContent, true);
-            helper.setFrom("PsicoCare <example@example.com>");
+            helper.setFrom("PsicoCare <" + emailFrom + ">");
         } catch (IOException | MessagingException ex) {
             throw new ParseEmailInfosException("Error to parse email infos");
         }
@@ -94,7 +98,6 @@ public class EmailSenderService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(psychologistModel.getEmail());
-            System.out.println(psychologistModel.getEmail());
             helper.setSubject("Today Schedules");
 
             ClassPathResource resource = new ClassPathResource("static/schedules-template.html");
@@ -103,7 +106,7 @@ public class EmailSenderService {
             emailContent = emailContent.replace("${therapySessions}", therapySessionsHtml.toString());
 
             helper.setText(emailContent, true);
-            helper.setFrom("PsicoCare <example@example.com>");
+            helper.setFrom("PsicoCare <" + emailFrom + ">");
         } catch (IOException | MessagingException ex) {
             throw new ParseEmailInfosException("Error to parse email infos");
         }

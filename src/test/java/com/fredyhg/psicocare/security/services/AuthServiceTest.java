@@ -50,7 +50,6 @@ class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
-
     @Test
     void authenticateSuccess() {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO("user@example.com", "password");
@@ -68,7 +67,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshTokenSuccess() throws IOException {
+    void refreshTokenSuccess() {
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer validRefreshToken");
         UserModel user = new UserModel();
@@ -81,8 +80,7 @@ class AuthServiceTest {
 
         AuthenticationResponse authenticationResponse = authService.refreshToken(request, response);
 
-        assertEquals(authenticationResponse.getRefreshToken(), "validRefreshToken");
+        assertEquals("validRefreshToken", authenticationResponse.getRefreshToken() );
 
     }
-
 }

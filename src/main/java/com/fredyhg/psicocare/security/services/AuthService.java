@@ -1,7 +1,11 @@
 package com.fredyhg.psicocare.security.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fredyhg.psicocare.exceptions.security.InvalidTokenException;
+import com.fredyhg.psicocare.exceptions.security.PasswordInvalidException;
+import com.fredyhg.psicocare.exceptions.security.PasswordMismatchException;
 import com.fredyhg.psicocare.exceptions.security.UserException;
+import com.fredyhg.psicocare.exceptions.utils.ResponseMessage;
+import com.fredyhg.psicocare.models.dtos.auth.ChangePasswordPostRequest;
 import com.fredyhg.psicocare.security.models.AuthenticationResponse;
 import com.fredyhg.psicocare.security.models.UserModel;
 import com.fredyhg.psicocare.security.models.UserToken;
@@ -15,10 +19,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,8 @@ public class AuthService {
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
+
+    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationResponse authenticate(AuthenticationDTO authenticationDTO){
         authenticationManager.authenticate(
@@ -101,4 +111,34 @@ public class AuthService {
         throw new InternalAuthenticationServiceException("Error to parse token");
     }
 
+    public void changePassword(ChangePasswordPostRequest changePasswordPostRequest, HttpServletRequest request) {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String token;
+
+        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+            throw new InvalidTokenException("Invalid token");
+        }
+
+        token = authHeader.substring(7);
+
+        String username = jwtService.extractUsername(token);
+
+        UserModel user = userModelRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found"));
+
+        if(!passwordEncoder.matches(changePasswordPostRequest.getOldPassword(), user.getPassword())){
+            throw new PasswordMismatchException("Password mismatch");
+        }
+
+
+        String newPassword = changePasswordPostRequest.getNewPassword();
+
+        if(newPassword.isBlank() || newPassword.length() < 8){
+            throw new PasswordInvalidException("Password invalid format");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userModelRepository.save(user);
+    }
 }

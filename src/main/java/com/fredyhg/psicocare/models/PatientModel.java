@@ -44,4 +44,9 @@ public class PatientModel {
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @PrePersist
+    private void onCreate(){
+        createAt = LocalDateTime.now();
+    }
 }

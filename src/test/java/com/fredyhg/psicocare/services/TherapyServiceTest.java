@@ -2,7 +2,7 @@ package com.fredyhg.psicocare.services;
 
 
 import com.fredyhg.psicocare.enums.StatusTherapy;
-import com.fredyhg.psicocare.exceptions.ConfirmationCodeNotFoundException;
+import com.fredyhg.psicocare.exceptions.code.ConfirmationCodeNotFoundException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyAlreadyExistsException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidDatesException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidStatusException;
@@ -19,7 +19,6 @@ import com.fredyhg.psicocare.utils.ConfirmationCodeCreator;
 import com.fredyhg.psicocare.utils.PatientCreator;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
 import com.fredyhg.psicocare.utils.TherapyCreator;
-import jdk.jshell.Snippet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

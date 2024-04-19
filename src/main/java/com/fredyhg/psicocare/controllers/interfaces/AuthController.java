@@ -13,18 +13,22 @@ public interface AuthController {
 
     @Operation(summary = "Authentication user", description = "Anyone can make this request", tags = "AUTH")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Account created successfully"),
-            @ApiResponse(responseCode = "400", description = "User credentials error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized request")
+            @ApiResponse(responseCode = "200", description = "Authentication successfully"),
+            @ApiResponse(responseCode = "401", description = "Bad credentials")
     })
     ResponseEntity<AuthenticationResponse> authenticate(AuthenticationDTO authenticationDto);
 
-    @Operation(summary = "Authentication user", description = "Anyone can make this request", tags = "AUTH")
+    @Operation(summary = "Refresh bearer token", description = "Anyone can make this request", tags = "AUTH")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Account created successfully"),
-            @ApiResponse(responseCode = "400", description = "User credentials error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized request")
+            @ApiResponse(responseCode = "201", description = "Token refreshed successfully"),
+            @ApiResponse(responseCode = "403", description = "Invalid token"),
     })
     ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response);
 
+    @Operation(summary = "Check login", description = "Anyone can make this request", tags = "AUTH")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Bearer token valid"),
+            @ApiResponse(responseCode = "401", description = "Invalid Token"),
+    })
+    ResponseEntity<Boolean> checkLogin();
 }

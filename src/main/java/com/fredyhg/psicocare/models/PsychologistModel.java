@@ -40,4 +40,9 @@ public class PsychologistModel {
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
+    @PrePersist
+    private void onCreate(){
+        createAt = LocalDateTime.now();
+    }
+
 }

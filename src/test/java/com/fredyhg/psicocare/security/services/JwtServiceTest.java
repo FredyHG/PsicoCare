@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -22,9 +23,14 @@ class JwtServiceTest {
     @InjectMocks
     private JwtService jwtService;
 
-    private String secretKey = "25a5356a4956aac7944e164e531d5bd4c145d4057aafabe921648ce4b433a19e";
-    private long jwtExpiration = 3600000;
-    private long refreshExpiration = 7200000;
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${application.security.jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${application.security.jwt.refresh-expiration}")
+    private long refreshExpiration;
 
 
     @BeforeEach

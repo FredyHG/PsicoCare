@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class TherapyCreateRequest {
+public class TherapyPostRequest {
 
     private String crpPsychologist;
 

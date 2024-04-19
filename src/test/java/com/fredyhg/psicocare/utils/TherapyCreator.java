@@ -3,7 +3,7 @@ package com.fredyhg.psicocare.utils;
 import com.fredyhg.psicocare.enums.StatusTherapy;
 import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.models.dtos.therapy.SchedulePutRequest;
-import com.fredyhg.psicocare.models.dtos.therapy.TherapyCreateRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.TherapyPostRequest;
 
 import java.time.LocalDateTime;
 
@@ -39,8 +39,8 @@ public class TherapyCreator {
                 .build();
     }
 
-    public static TherapyCreateRequest createValidTherapyCreateRequest(){
-        return TherapyCreateRequest.builder()
+    public static TherapyPostRequest createValidTherapyCreateRequest(){
+        return TherapyPostRequest.builder()
                 .crpPsychologist("123123")
                 .cpfPatient("12121")
                 .dateTime(LocalDateTime.of(2026, 4, 15, 14, 30, 0))

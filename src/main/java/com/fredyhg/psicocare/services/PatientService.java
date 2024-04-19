@@ -1,16 +1,20 @@
 package com.fredyhg.psicocare.services;
 
 import com.fredyhg.psicocare.exceptions.patient.PatientAlreadyRegisteredException;
+import com.fredyhg.psicocare.exceptions.patient.PatientLinkedToTherapyException;
 import com.fredyhg.psicocare.exceptions.patient.PatientNotFoundException;
 import com.fredyhg.psicocare.exceptions.utils.AgeException;
 import com.fredyhg.psicocare.models.PatientModel;
+import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.models.dtos.patient.PatientGetRequest;
 import com.fredyhg.psicocare.models.dtos.patient.PatientPostRequest;
 import com.fredyhg.psicocare.models.dtos.patient.PatientPutRequest;
 import com.fredyhg.psicocare.repositories.PatientRepository;
+import com.fredyhg.psicocare.repositories.TherapyRepository;
 import com.fredyhg.psicocare.utils.ModelMappers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,24 +30,21 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
 
+    private final TherapyRepository therapyRepository;
+
     @Transactional
     public void createPatient(PatientPostRequest patientToBeCreate){
 
         this.ensurePatientByEmailOrCpfNonExists(patientToBeCreate.getEmail(), patientToBeCreate.getCpf());
-        System.out.println(patientToBeCreate.getBirthDate());
         this.ensurePatientHasValidAge(patientToBeCreate.getBirthDate());
 
         patientRepository.save(ModelMappers.patientPostRequestToPatientModel(patientToBeCreate));
     }
 
     public Page<PatientGetRequest> getPatients(Pageable pageable){
-        Page<PatientModel> patientsPageable = patientRepository.findAll(pageable);
 
-        List<PatientGetRequest> listOfPatient = patientsPageable.stream()
-                .map(ModelMappers::patientModelToPatientGetRequest)
-                .toList();
-
-        return new PageImpl<>(listOfPatient);
+        return patientRepository.findAll(pageable)
+                .map(ModelMappers::patientModelToPatientGetRequest);
     }
 
     @Transactional
@@ -60,6 +61,11 @@ public class PatientService {
     public void delete(String cpf) {
 
         PatientModel patient = ensurePatientByCPFExists(cpf);
+        Optional<TherapyModel> therapyExists = therapyRepository.findByPatient(patient);
+
+        if(therapyExists.isPresent()){
+            throw new PatientLinkedToTherapyException("This patient cannot be deleted as they are currently linked to an ongoing therapy session.");
+        }
 
         patientRepository.delete(patient);
     }
@@ -87,13 +93,15 @@ public class PatientService {
 
     public Page<PatientGetRequest> getPatientsFiltered(Optional<String> name, Optional<String> lastName, Optional<String> cpf, Optional<String> email, Pageable pageable) {
 
-        Page<PatientModel> pageListOfPatientModel = patientRepository.findAllFiltered(name.orElse(null), lastName.orElse(null), cpf.orElse(null), email.orElse(null), pageable);
+        return patientRepository.findAllFiltered(name.orElse(null),
+                lastName.orElse(null),
+                cpf.orElse(null),
+                email.orElse(null),
+                pageable).map(ModelMappers::patientModelToPatientGetRequest);
+    }
 
-        List<PatientGetRequest> listOfPatient = pageListOfPatientModel.stream()
-                .map(ModelMappers::patientModelToPatientGetRequest)
-                .toList();
-
-        return new PageImpl<>(listOfPatient);
+    public Optional<PatientModel> getOptionalPatientByCPF(String cpf){
+        return patientRepository.findByCpf(cpf);
     }
 
 

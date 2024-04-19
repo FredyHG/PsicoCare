@@ -1,11 +1,12 @@
 package com.fredyhg.psicocare.controllers;
 
 import com.fredyhg.psicocare.controllers.interfaces.TherapyController;
+import com.fredyhg.psicocare.enums.StatusTherapy;
 import com.fredyhg.psicocare.exceptions.utils.ResponseMessage;
 import com.fredyhg.psicocare.models.dtos.code.Code;
 import com.fredyhg.psicocare.models.dtos.therapy.ReschedulePutRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.SchedulePutRequest;
-import com.fredyhg.psicocare.models.dtos.therapy.TherapyCreateRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.TherapyPostRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.TherapyGetRequest;
 import com.fredyhg.psicocare.services.TherapyService;
 import com.fredyhg.psicocare.utils.Utils;
@@ -13,10 +14,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,8 +33,8 @@ public class TherapyControllerImpl implements TherapyController {
 
     @PostMapping("/schedule")
     @Override
-    public ResponseEntity<ResponseMessage> scheduleTherapy(@RequestBody @Valid TherapyCreateRequest therapyCreateRequest){
-        therapyService.createTherapy(therapyCreateRequest);
+    public ResponseEntity<ResponseMessage> scheduleTherapy(@RequestBody @Valid TherapyPostRequest therapyPostRequest){
+        therapyService.createTherapy(therapyPostRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(Utils.createResponseMessage(
                 201,
                 "Therapy scheduled successfully"));
@@ -44,7 +49,7 @@ public class TherapyControllerImpl implements TherapyController {
                 "Therapy rescheduled successfully"));
     }
 
-    @PutMapping("/cancel")
+    @PostMapping("/cancel")
     @Override
     public ResponseEntity<ResponseMessage> cancelTherapy(@RequestBody @Valid SchedulePutRequest schedulePutRequest){
         therapyService.cancelTherapy(schedulePutRequest);
@@ -53,7 +58,7 @@ public class TherapyControllerImpl implements TherapyController {
                 "Therapy canceled successfully"));
     }
 
-    @PutMapping("/confirm/{id}")
+    @PostMapping("/confirm/{id}")
     @Override
     public ResponseEntity<ResponseMessage> confirmTherapy(@PathVariable UUID id, @RequestBody Code code){
         therapyService.confirmTherapy(id, code);
@@ -66,5 +71,32 @@ public class TherapyControllerImpl implements TherapyController {
     @Override
     public ResponseEntity<Page<TherapyGetRequest>> getAllPendingTherapies(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(therapyService.getAllTherapiesPending(pageable));
+    }
+
+    @GetMapping("/allWithStatus")
+    public ResponseEntity<Page<TherapyGetRequest>> getAllTherapiesWithStatus(Pageable pageable, @RequestParam String status){
+        return ResponseEntity.status(HttpStatus.OK) .body(therapyService.getAllTherapiesWithStatus(pageable, status));
+    }
+
+    @GetMapping("/all")
+    @Override
+    public ResponseEntity<Page<TherapyGetRequest>> getAllTherapies(Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK).body(therapyService.getAllTherapies(pageable));
+    }
+
+    @GetMapping("/filter")
+    @Override
+    public ResponseEntity<Page<TherapyGetRequest>> getAllTherapiesFiltered(@RequestParam Optional<String> patientCPF,
+                                                                           @RequestParam Optional<String> psychologistCRP,
+                                                                           @RequestParam Optional<String> status,
+                                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                                            Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK).body(therapyService.getAllTherapiesFiltered(patientCPF,
+                                                                                                psychologistCRP,
+                                                                                                status,
+                                                                                                startDate,
+                                                                                                endDate,
+                                                                                                pageable));
     }
 }

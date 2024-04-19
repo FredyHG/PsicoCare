@@ -1,13 +1,11 @@
 package com.fredyhg.psicocare.services;
 
-import com.fredyhg.psicocare.exceptions.ConfirmationCodeNotFoundException;
-import com.fredyhg.psicocare.exceptions.therapy.TherapyNotFoundException;
+import com.fredyhg.psicocare.exceptions.code.ConfirmationCodeNotFoundException;
 import com.fredyhg.psicocare.models.ConfirmationCodeModel;
 import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.repositories.ConfirmationCodeRepository;
 import com.fredyhg.psicocare.utils.ConfirmationCodeCreator;
 import com.fredyhg.psicocare.utils.TherapyCreator;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
