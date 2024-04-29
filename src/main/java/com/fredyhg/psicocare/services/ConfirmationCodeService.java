@@ -1,6 +1,6 @@
 package com.fredyhg.psicocare.services;
 
-import com.fredyhg.psicocare.exceptions.ConfirmationCodeNotFoundException;
+import com.fredyhg.psicocare.exceptions.code.ConfirmationCodeNotFoundException;
 import com.fredyhg.psicocare.models.ConfirmationCodeModel;
 import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.repositories.ConfirmationCodeRepository;

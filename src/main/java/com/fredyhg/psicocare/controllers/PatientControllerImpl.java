@@ -25,7 +25,7 @@ public class PatientControllerImpl implements PatientController {
     private final PatientService patientService;
 
 
-    @PostMapping
+    @PostMapping("/create")
     @Override
     public ResponseEntity<ResponseMessage> createPatient(@RequestBody @Valid PatientPostRequest patientPostRequest){
         patientService.createPatient(patientPostRequest);
@@ -34,13 +34,13 @@ public class PatientControllerImpl implements PatientController {
                 "Patient registered successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @Override
     public ResponseEntity<Page<PatientGetRequest>> getAllPatient(Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatients(pageable));
     }
 
-    @PutMapping
+    @PutMapping("/edit")
     @Override
     public ResponseEntity<ResponseMessage> editPatientInfos(@RequestBody @Valid PatientPutRequest patientPutRequest){
         patientService.editPatientInfos(patientPutRequest);
@@ -59,10 +59,10 @@ public class PatientControllerImpl implements PatientController {
                                                                   @RequestParam Optional<String> email, Pageable pageable){
 
         return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatientsFiltered(name, lastName, cpf, email, pageable));
-
     }
 
     @DeleteMapping("/delete")
+    @Override
     public ResponseEntity<ResponseMessage> deletePatient(@RequestParam String cpf){
         patientService.delete(cpf);
         return ResponseEntity.status(HttpStatus.OK).body(Utils.createResponseMessage(

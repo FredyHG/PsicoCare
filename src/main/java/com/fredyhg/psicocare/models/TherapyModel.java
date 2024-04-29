@@ -25,18 +25,14 @@ public class TherapyModel {
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "therapy_patient",
-            joinColumns = @JoinColumn(name = "therapy_id"),
-            inverseJoinColumns = @JoinColumn(name = "patient_id")
+    @JoinColumn(
+            name = "patient.id"
     )
     private PatientModel patient;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "therapy_psychologist",
-            joinColumns = @JoinColumn(name = "therapy_id"),
-            inverseJoinColumns = @JoinColumn(name = "psychologist_id")
+    @JoinColumn(
+            name = "psychologist.id"
     )
     private PsychologistModel psychologist;
 
@@ -48,6 +44,11 @@ public class TherapyModel {
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @PrePersist
+    private void onCreate(){
+        createAt = LocalDateTime.now();
+    }
 
     public boolean isValidStatusForChange(TherapyModel therapyModel){
         return therapyModel.getStatus() == StatusTherapy.FINISH;

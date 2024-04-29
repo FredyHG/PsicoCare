@@ -1,14 +1,10 @@
 package com.fredyhg.psicocare.exceptions.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @Builder
 public class ResponseMessage {

@@ -19,7 +19,7 @@ public interface PsychologistController {
     })
     ResponseEntity<ResponseMessage> createPsychologist(PsychologistPostRequest psychologistPostRequest);
 
-    @Operation(summary = "Get a pageable list of the Psychologist", tags = "Employee")
+    @Operation(summary = "Get a pageable list of the Psychologist", tags = "PSYCHOLOGIST")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Psychologist listed successfully"),
     })

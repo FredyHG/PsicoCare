@@ -18,13 +18,14 @@ public interface PatientRepository extends JpaRepository<PatientModel, UUID> {
 
 
     @Query(value = """
-            SELECT *
-            FROM tb_patient tp\s
-            WHERE\s
-                (LOWER(tp.name) LIKE LOWER(CONCAT(:name, '%')) OR :name IS NULL)
-                AND (LOWER(tp.last_name) LIKE LOWER(CONCAT(:last_name, '%')) OR :last_name IS NULL)
-                AND (LOWER(tp.cpf) LIKE LOWER(CONCAT(:cpf, '%')) OR :cpf IS NULL)
-                AND (LOWER(tp.email) LIKE LOWER(CONCAT(:email, '%')) OR :email IS NULL)""", nativeQuery = true)
+                SELECT *
+                FROM tb_patient tp\s
+                WHERE\s
+                    (LOWER(tp.name) LIKE LOWER(CONCAT(:name, '%')) OR :name IS NULL)
+                    AND (LOWER(tp.last_name) LIKE LOWER(CONCAT(:last_name, '%')) OR :last_name IS NULL)
+                    AND (LOWER(tp.cpf) LIKE LOWER(CONCAT(:cpf, '%')) OR :cpf IS NULL)
+                    AND (LOWER(tp.email) LIKE LOWER(CONCAT(:email, '%')) OR :email IS NULL)
+            """, nativeQuery = true)
     Page<PatientModel> findAllFiltered(@Param("name") String name,
                                        @Param("last_name") String lastName,
                                        @Param("cpf") String cpf,

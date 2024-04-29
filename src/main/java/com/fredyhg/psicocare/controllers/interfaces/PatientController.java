@@ -15,30 +15,40 @@ import java.util.Optional;
 
 public interface PatientController {
 
-    @Operation(summary = "Register a patient", description = "Register a new patient based on the information provided in the PatientPostRequest object.", tags = "Employee")
+    @Operation(summary = "Create a patient", description = "Create a new patient based on the information provided in the PatientPostRequest object.", tags = "PSYCHOLOGIST")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Patient registered successfully"),
             @ApiResponse(responseCode = "409", description = "Patient already registered")
     })
     ResponseEntity<ResponseMessage> createPatient(PatientPostRequest patientPostRequest);
 
-    @Operation(summary = "Get a pageable list of the Patients", tags = "Employee")
+    @Operation(summary = "Get a pageable list of the Patients", tags = "PSYCHOLOGIST")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patients listed successfully"),
     })
     ResponseEntity<Page<PatientGetRequest>> getAllPatient(Pageable pageable);
 
-    @Operation(summary = "Edit patients info", tags = "Employee")
+    @Operation(summary = "Edit patients info", tags = "PSYCHOLOGIST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "", description = "Patient edited successfully"),
+            @ApiResponse(responseCode = "200", description = "Patient edited successfully"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
     ResponseEntity<ResponseMessage> editPatientInfos(PatientPutRequest patientPutRequest);
 
 
-    @Operation(summary = "Get patients by name or lastName or cpf or email")
+    @Operation(summary = "Get patients by name or lastName or cpf or email", tags = "PSYCHOLOGIST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Patients filtered and listed successfully.")
+    })
     public ResponseEntity<Page<PatientGetRequest>> getPatientsFiltered(Optional<String> name,
                                                                   Optional<String> lastName,
                                                                   Optional<String> cpf,
                                                                   Optional<String> email, Pageable pageable);
+
+    @Operation(summary = "", tags = "PSYCHOLOGIST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Patient deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Patient not found")
+    })
+    ResponseEntity<ResponseMessage> deletePatient(String cpf);
 }

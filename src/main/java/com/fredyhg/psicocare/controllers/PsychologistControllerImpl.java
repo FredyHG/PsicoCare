@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("api/psychologist")
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ public class PsychologistControllerImpl implements PsychologistController {
 
     private final PsychologistService psychologistService;
 
-    @PostMapping
+    @PostMapping("/create")
     @Override
     public ResponseEntity<ResponseMessage> createPsychologist(@RequestBody @Valid PsychologistPostRequest psychologistPostRequest){
         psychologistService.createPsychologist(psychologistPostRequest);
@@ -30,9 +33,24 @@ public class PsychologistControllerImpl implements PsychologistController {
                 "Psychologist created successfully"));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @Override
     public ResponseEntity<Page<PsychologistGetRequest>> getAllPsychologists(Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(psychologistService.getAllPsychologistsPageable(pageable));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<PsychologistGetRequest>> getPsychologistFiltered(@RequestParam Optional<String> name,
+                                                                                @RequestParam Optional<String> lastName,
+                                                                                @RequestParam Optional<String> crp,
+                                                                                @RequestParam Optional<String> email,
+                                                                                Pageable pageable){
+
+        return ResponseEntity.status(HttpStatus.OK).body(psychologistService.getAllPsychologistsFiltered(name, lastName, crp, email, pageable));
+    }
+
+    @GetMapping("/byToken")
+    public ResponseEntity<PsychologistGetRequest> getPsychologistFromToken(@RequestParam String token){
+        return ResponseEntity.status(HttpStatus.OK).body(psychologistService.getPsychologistFromToken(token));
     }
 }

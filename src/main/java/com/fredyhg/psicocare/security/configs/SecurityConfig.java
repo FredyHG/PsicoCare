@@ -15,8 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -33,14 +31,14 @@ public class SecurityConfig {
         http
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/", "/status").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/authenticate", "/api/auth/refresh-token").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/psychologist").hasAnyRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/patient", "/api/patient/filter").hasAnyRole("PSYCHOLOGIST")
+                        .requestMatchers(HttpMethod.GET, "/api/patient/all", "/api/patient/filter", "/api/therapy/pending",
+                                "/api/therapy/filter", "/api/psychologist/byToken", "/api/psychologist/all", "/api/therapy/all",
+                                "/api/therapy/allWithStatus", "/api/psychologist/filter").hasAnyRole("PSYCHOLOGIST", "ROOT")
                         .requestMatchers(HttpMethod.DELETE, "/api/patient/delete").hasAnyRole("PSYCHOLOGIST")
-                        .requestMatchers(HttpMethod.POST, "/api/auth/check-login", "/api/therapy/schedule", "/api/patient").hasAnyRole("PSYCHOLOGIST", "ROOT")
-                        .requestMatchers(HttpMethod.PUT, "/api/patient").hasAnyRole("PSYCHOLOGIST", "ROOT")
-                        .anyRequest().hasRole("ROOT")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/check-login", "/api/therapy/schedule", "/api/patient/create", "/api/psychologist/create", "/api/auth/change-password").hasAnyRole("PSYCHOLOGIST", "ROOT")
+                        .requestMatchers(HttpMethod.PUT, "/api/patient/edit").hasAnyRole("PSYCHOLOGIST", "ROOT")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

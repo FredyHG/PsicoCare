@@ -1,7 +1,7 @@
 package com.fredyhg.psicocare.services;
 
 import com.fredyhg.psicocare.enums.StatusTherapy;
-import com.fredyhg.psicocare.exceptions.ConfirmationCodeNotFoundException;
+import com.fredyhg.psicocare.exceptions.code.ConfirmationCodeNotFoundException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyAlreadyExistsException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidDatesException;
 import com.fredyhg.psicocare.exceptions.therapy.TherapyInvalidStatusException;
@@ -13,23 +13,25 @@ import com.fredyhg.psicocare.models.TherapyModel;
 import com.fredyhg.psicocare.models.dtos.code.Code;
 import com.fredyhg.psicocare.models.dtos.therapy.ReschedulePutRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.SchedulePutRequest;
-import com.fredyhg.psicocare.models.dtos.therapy.TherapyCreateRequest;
+import com.fredyhg.psicocare.models.dtos.therapy.TherapyPostRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.TherapyGetRequest;
 import com.fredyhg.psicocare.repositories.TherapyRepository;
 import com.fredyhg.psicocare.utils.ModelMappers;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.engine.spi.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,15 +48,15 @@ public class TherapyService {
     private final ConfirmationCodeService confirmationCodeService;
 
     @Transactional
-    public void createTherapy(TherapyCreateRequest therapyCreateRequest){
+    public void createTherapy(TherapyPostRequest therapyPostRequest){
 
-        var patientModel = patientService.ensurePatientByCPFExists(therapyCreateRequest.getCpfPatient());
+        var patientModel = patientService.ensurePatientByCPFExists(therapyPostRequest.getCpfPatient());
 
-        var psychologistModel = psychologistService.ensurePsychologistByCrpExists(therapyCreateRequest.getCrpPsychologist());
+        var psychologistModel = psychologistService.ensurePsychologistByCrpExists(therapyPostRequest.getCrpPsychologist());
 
         this.ensureTherapyNonExistsWithInvalidStatus(patientModel, psychologistModel);
 
-        var therapyToBeSaved = ModelMappers.therapyCreateRequestToTherapyModel(therapyCreateRequest, patientModel, psychologistModel);
+        var therapyToBeSaved = ModelMappers.therapyCreateRequestToTherapyModel(therapyPostRequest, patientModel, psychologistModel);
 
         this.ensureTherapyDatesIsValid(therapyToBeSaved);
 
@@ -118,6 +120,23 @@ public class TherapyService {
     public Page<TherapyGetRequest> getAllTherapiesPending(Pageable pageable){
 
         Page<TherapyModel> therapyPageable = therapyRepository.findByStatus(StatusTherapy.WAIT_DATE, pageable);
+
+        List<TherapyGetRequest> listOfTherapyGet = this.convertToTherapyGetRequests(therapyPageable);
+
+        return new PageImpl<>(listOfTherapyGet);
+    }
+
+    public Page<TherapyGetRequest> getAllTherapies(Pageable pageable){
+
+        return therapyRepository.findAll(pageable)
+                .map(ModelMappers::therapyModelToTherapyGetRequest);
+    }
+
+    public Page<TherapyGetRequest> getAllTherapiesWithStatus(Pageable pageable, String status){
+
+        StatusTherapy statusTherapy = StatusTherapy.valueOf(status);
+
+        Page<TherapyModel> therapyPageable = therapyRepository.findByStatus(statusTherapy, pageable);
 
         List<TherapyGetRequest> listOfTherapyGet = this.convertToTherapyGetRequests(therapyPageable);
 
@@ -203,6 +222,36 @@ public class TherapyService {
     public void ensureTherapyDatesIsValid(TherapyModel therapyModel){
         if(therapyModel.isValidDateForSchedule(therapyModel)){
             throw new TherapyInvalidDatesException("Schedule date time invalid");
+        }
+    }
+
+    public Page<TherapyGetRequest> getAllTherapiesFiltered(Optional<String> patientCPF,
+                                                           Optional<String> psychologistCRP,
+                                                           Optional<String> status,
+                                                           LocalDateTime startDate,
+                                                           LocalDateTime endDate,
+                                                           Pageable pageable) {
+        StatusTherapy statusTherapy = null;
+
+        if(status.isPresent()){
+            statusTherapy = ensureStatusTherapyExistsFromString(status.get());
+        }
+
+        return therapyRepository.findAllFiltered(patientCPF.orElse(null),
+                psychologistCRP.orElse(null), startDate, endDate, statusTherapy, pageable)
+                .map(ModelMappers::therapyModelToTherapyGetRequest);
+    }
+
+    public StatusTherapy ensureStatusTherapyExistsFromString(String status){
+
+        if(status == null){
+            return null;
+        }
+
+        try {
+            return StatusTherapy.valueOf(status);
+        } catch (IllegalArgumentException ex){
+            throw new TherapyInvalidStatusException("invalid status");
         }
     }
 }
