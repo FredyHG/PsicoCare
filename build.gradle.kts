@@ -77,21 +77,21 @@ tasks.jacocoTestReport {
 }
 
 //Disable in prod
-val properties = Properties()
-file("local.properties").inputStream().use {
-	properties.load(it)
-}
-val sonarKey = "sqb_8dc6a7309645e2a71e2a4bc52890ad5bdbc85f8e"
-
-
-sonarqube {
-	properties {
-		property("sonar.projectKey", sonarKey)
-		property("sonar.host.url", "http://localhost:9000")
-		property("sonar.login", "admin")
-		property("sonar.password", "admin1")
-		property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
-		property("sonar.exclusions", "**/models/**")
-		property("sonar.coverage.exclusions", "**/exceptions/**, **/dtos/**,PsicoCareApplication.java, **/controllers/**, **/security/configs/**")
-	}
-}
+//val properties = Properties()
+//file("local.properties").inputStream().use {
+//	properties.load(it)
+//}
+//val sonarKey = "sqb_8dc6a7309645e2a71e2a4bc52890ad5bdbc85f8e"
+//
+//
+//sonarqube {
+//	properties {
+//		property("sonar.projectKey", sonarKey)
+//		property("sonar.host.url", "http://localhost:9000")
+//		property("sonar.login", "admin")
+//		property("sonar.password", "admin1")
+//		property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+//		property("sonar.exclusions", "**/models/**")
+//		property("sonar.coverage.exclusions", "**/exceptions/**, **/dtos/**,PsicoCareApplication.java, **/controllers/**, **/security/configs/**")
+//	}
+//}
