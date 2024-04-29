@@ -41,5 +41,8 @@ jobs:
           -e POSTGRES_URL=${{secrets.POSTGRES_URL}} \
           -e MAIL_USERNAME=${{secrets.MAIL_USERNAME}} \
           -e MAIL_PASSWORD=${{secrets.MAIL_PASSWORD}} \
+          -e MAIL_PASSWORD=${{secrets.MAIL_HOST}} \
+          -e MAIL_PORT=${{secrets.MAIL_PORT}} \
+          -e JWT_SECRET_KEY=${{secrets.JWT_SECRET_KEY}} \
           --name deploy_psicocare \
           dracarys22/deploy_psicocare:latest
