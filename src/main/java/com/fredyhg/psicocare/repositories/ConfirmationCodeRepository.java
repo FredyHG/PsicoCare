@@ -10,6 +10,4 @@ import java.util.UUID;
 public interface ConfirmationCodeRepository extends JpaRepository<ConfirmationCodeModel, UUID> {
 
     Optional<ConfirmationCodeModel> findByTherapy(TherapyModel therapyModel);
-
-
 }
