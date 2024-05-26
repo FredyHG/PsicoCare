@@ -6,6 +6,7 @@ import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistGetRequest;
 import com.fredyhg.psicocare.repositories.PsychologistRepository;
 import com.fredyhg.psicocare.security.services.UserService;
+import com.fredyhg.psicocare.services.impl.PsychologistServiceImpl;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PsychologistServiceTest {
+class PsychologistServiceImplTest {
 
     @Mock
     private PsychologistRepository psychologistRepository;
@@ -34,7 +35,7 @@ class PsychologistServiceTest {
     private UserService userService;
 
     @InjectMocks
-    private PsychologistService psychologistService;
+    private PsychologistServiceImpl psychologistServiceImpl;
 
 
     @Test
@@ -43,7 +44,7 @@ class PsychologistServiceTest {
 
         when(psychologistRepository.findByCrp(Mockito.anyString())).thenReturn(Optional.empty());
 
-        psychologistService.createPsychologist(psychologistPostRequest);
+        psychologistServiceImpl.createPsychologist(psychologistPostRequest);
 
         verify(psychologistRepository, Mockito.times(1)).save(Mockito.any());
     }
@@ -55,7 +56,7 @@ class PsychologistServiceTest {
 
         when(psychologistRepository.findByCrp(crp)).thenReturn(Optional.empty());
 
-        assertThrows(PsychologistNotFoundException.class, () -> psychologistService.ensurePsychologistByCrpExists(crp));
+        assertThrows(PsychologistNotFoundException.class, () -> psychologistServiceImpl.ensurePsychologistByCrpExists(crp));
     }
 
     @Test
@@ -64,7 +65,7 @@ class PsychologistServiceTest {
 
         when(psychologistRepository.findByCrp(crp)).thenReturn(Optional.of(new PsychologistModel()));
 
-        assertThrows(PsychologistAlreadyRegisteredException.class, () -> psychologistService.ensurePsychologistNonExistsByCrp(crp));
+        assertThrows(PsychologistAlreadyRegisteredException.class, () -> psychologistServiceImpl.ensurePsychologistNonExistsByCrp(crp));
     }
 
     @Test
@@ -75,7 +76,7 @@ class PsychologistServiceTest {
 
         when(psychologistRepository.findAll(pageable)).thenReturn(psychologistModelPage);
 
-        Page<PsychologistGetRequest> result = psychologistService.getAllPsychologistsPageable(pageable);
+        Page<PsychologistGetRequest> result = psychologistServiceImpl.getAllPsychologistsPageable(pageable);
 
         assertNotNull(result);
         assertEquals(psychologistModelList.size(), result.getContent().size());

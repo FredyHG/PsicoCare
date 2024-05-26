@@ -8,7 +8,7 @@ import com.fredyhg.psicocare.security.models.UserModel;
 import com.fredyhg.psicocare.security.models.UserToken;
 import com.fredyhg.psicocare.security.repositories.UserModelRepository;
 import com.fredyhg.psicocare.security.repositories.UserTokenRepository;
-import com.fredyhg.psicocare.services.EmailSenderService;
+import com.fredyhg.psicocare.services.impl.EmailSenderServiceImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +30,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final EmailSenderService emailSenderService;
+    private final EmailSenderServiceImpl emailSenderServiceImpl;
 
     @Transactional
     public void createUser(PsychologistModel psychologist){
@@ -51,7 +51,7 @@ public class UserService {
 
         saveUserToken(savedUser, jwtToken);
 
-        emailSenderService.sendAccessDetailsEmail(psychologist, passwordGen);
+        emailSenderServiceImpl.sendAccessDetailsEmail(psychologist, passwordGen);
     }
 
     @Transactional

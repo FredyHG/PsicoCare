@@ -6,7 +6,7 @@ import com.fredyhg.psicocare.security.models.UserModel;
 import com.fredyhg.psicocare.security.models.UserToken;
 import com.fredyhg.psicocare.security.repositories.UserModelRepository;
 import com.fredyhg.psicocare.security.repositories.UserTokenRepository;
-import com.fredyhg.psicocare.services.EmailSenderService;
+import com.fredyhg.psicocare.services.impl.EmailSenderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,7 +41,7 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private EmailSenderService emailSenderService;
+    private EmailSenderServiceImpl emailSenderServiceImpl;
 
     @Test
     void createUserTest() {
@@ -58,7 +58,7 @@ class UserServiceTest {
 
         verify(userRepository).save(any(UserModel.class));
         verify(jwtService).generateToken(savedUser);
-        verify(emailSenderService).sendAccessDetailsEmail(eq(psychologist), anyString());
+        verify(emailSenderServiceImpl).sendAccessDetailsEmail(eq(psychologist), anyString());
     }
 
     @Test

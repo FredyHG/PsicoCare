@@ -1,9 +1,8 @@
 package com.fredyhg.psicocare.services;
 
-import com.fredyhg.psicocare.models.PatientModel;
 import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.models.TherapyModel;
-import com.fredyhg.psicocare.utils.PatientCreator;
+import com.fredyhg.psicocare.services.impl.EmailSenderServiceImpl;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
 import com.fredyhg.psicocare.utils.TherapyCreator;
 import jakarta.mail.internet.MimeMessage;
@@ -18,13 +17,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class EmailSenderServiceTest {
+class EmailSenderServiceImplTest {
 
     @Mock
     private JavaMailSender mailSender;
 
     @InjectMocks
-    private EmailSenderService emailService;
+    private EmailSenderServiceImpl emailService;
 
     @Test
     void testSendEmail() {

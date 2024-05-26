@@ -15,6 +15,7 @@ import com.fredyhg.psicocare.models.dtos.therapy.SchedulePutRequest;
 import com.fredyhg.psicocare.models.dtos.therapy.TherapyGetRequest;
 import com.fredyhg.psicocare.repositories.ConfirmationCodeRepository;
 import com.fredyhg.psicocare.repositories.TherapyRepository;
+import com.fredyhg.psicocare.services.impl.*;
 import com.fredyhg.psicocare.utils.ConfirmationCodeCreator;
 import com.fredyhg.psicocare.utils.PatientCreator;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
@@ -39,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TherapyServiceTest {
+class TherapyServiceImplTest {
 
     @Mock
     private TherapyRepository therapyRepository;
@@ -57,7 +58,7 @@ class TherapyServiceTest {
     private ConfirmationCodeRepository confirmationCodeRepository;
 
     @Mock
-    private ConfirmationCodeService confirmationCodeService;
+    private ConfirmationCodeServiceImpl confirmationCodeServiceImpl;
 
     @InjectMocks
     private TherapyService therapyService;
@@ -187,11 +188,11 @@ class TherapyServiceTest {
         ConfirmationCodeModel codeModel = ConfirmationCodeCreator.createValidConfirmationCode();
 
         when(therapyRepository.findById(id)).thenReturn(Optional.of(therapyModel));
-        when(confirmationCodeService.getByTherapy(therapyModel)).thenReturn(codeModel);
+        when(confirmationCodeServiceImpl.getByTherapy(therapyModel)).thenReturn(codeModel);
 
         therapyService.confirmTherapy(id, code);
 
-        verify(confirmationCodeService).toggleUse(codeModel);
+        verify(confirmationCodeServiceImpl).toggleUse(codeModel);
         verify(therapyRepository).save(any(TherapyModel.class));
     }
 
@@ -204,7 +205,7 @@ class TherapyServiceTest {
         ConfirmationCodeModel codeModel = ConfirmationCodeCreator.createValidConfirmationCode();
 
         when(therapyRepository.findById(id)).thenReturn(Optional.of(therapyModel));
-        when(confirmationCodeService.getByTherapy(therapyModel)).thenReturn(codeModel);
+        when(confirmationCodeServiceImpl.getByTherapy(therapyModel)).thenReturn(codeModel);
 
         assertThrows(ConfirmationCodeNotFoundException.class, () -> therapyService.confirmTherapy(id, invalidCode));
     }
@@ -219,7 +220,7 @@ class TherapyServiceTest {
         ConfirmationCodeModel codeModel = ConfirmationCodeCreator.createValidConfirmationCode();
 
         when(therapyRepository.findById(id)).thenReturn(Optional.of(therapyModel));
-        when(confirmationCodeService.getByTherapy(therapyModel)).thenReturn(codeModel);
+        when(confirmationCodeServiceImpl.getByTherapy(therapyModel)).thenReturn(codeModel);
 
         assertThrows(TherapyInvalidStatusException.class, () -> therapyService.confirmTherapy(id, code));
     }

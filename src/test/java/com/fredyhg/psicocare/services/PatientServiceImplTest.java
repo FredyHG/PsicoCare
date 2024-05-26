@@ -6,6 +6,7 @@ import com.fredyhg.psicocare.models.PatientModel;
 import com.fredyhg.psicocare.models.dtos.patient.PatientGetRequest;
 import com.fredyhg.psicocare.models.dtos.patient.PatientPutRequest;
 import com.fredyhg.psicocare.repositories.PatientRepository;
+import com.fredyhg.psicocare.services.impl.PatientServiceImpl;
 import com.fredyhg.psicocare.utils.PatientCreator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,12 +31,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PatientServiceTest {
+class PatientServiceImplTest {
     @Mock
     private PatientRepository patientRepository;
 
     @InjectMocks
-    private PatientService patientService;
+    private PatientServiceImpl patientServiceImpl;
 
 
 
@@ -46,7 +47,7 @@ class PatientServiceTest {
         when(patientRepository.findByCpf(anyString())).thenReturn(Optional.empty());
         when(patientRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
-        patientService.createPatient(patientPostRequest);
+        patientServiceImpl.createPatient(patientPostRequest);
 
         verify(patientRepository, Mockito.times(1)).save(any());
     }
@@ -58,7 +59,7 @@ class PatientServiceTest {
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.of(patientModel));
 
-        PatientModel result = patientService.ensurePatientByCPFExists(cpf);
+        PatientModel result = patientServiceImpl.ensurePatientByCPFExists(cpf);
         assertEquals(result, patientModel);
     }
 
@@ -70,7 +71,7 @@ class PatientServiceTest {
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.empty());
         when(patientRepository.findByEmail(email)).thenReturn(Optional.empty());
 
-        assertDoesNotThrow(() -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
+        assertDoesNotThrow(() -> patientServiceImpl.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
 
     @Test
@@ -80,7 +81,7 @@ class PatientServiceTest {
 
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.of(new PatientModel()));
 
-        assertThrows(PatientAlreadyRegisteredException.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
+        assertThrows(PatientAlreadyRegisteredException.class, () -> patientServiceImpl.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
 
     @Test
@@ -91,7 +92,7 @@ class PatientServiceTest {
         when(patientRepository.findByCpf(cpf)).thenReturn(Optional.empty());
         when(patientRepository.findByEmail(email)).thenReturn(Optional.of(new PatientModel()));
 
-        assertThrows(PatientAlreadyRegisteredException.class, () -> patientService.ensurePatientByEmailOrCpfNonExists(email, cpf));
+        assertThrows(PatientAlreadyRegisteredException.class, () -> patientServiceImpl.ensurePatientByEmailOrCpfNonExists(email, cpf));
     }
 
     @Test
@@ -102,7 +103,7 @@ class PatientServiceTest {
 
         when(patientRepository.findAll(pageable)).thenReturn(patientModelPage);
 
-        Page<PatientGetRequest> result = patientService.getPatients(pageable);
+        Page<PatientGetRequest> result = patientServiceImpl.getPatients(pageable);
 
         assertNotNull(result);
         assertEquals(patientModelList.size(), result.getContent().size());
@@ -114,7 +115,7 @@ class PatientServiceTest {
     void testEditPatientInfos_SuccessfulUpdate() {
         when(patientRepository.findByCpf(anyString())).thenReturn(Optional.of(PatientCreator.createValidPatient()));
 
-        patientService.editPatientInfos(PatientCreator.createValidPatientPutRequest());
+        patientServiceImpl.editPatientInfos(PatientCreator.createValidPatientPutRequest());
 
         verify(patientRepository).save(any(PatientModel.class));
     }
@@ -125,7 +126,7 @@ class PatientServiceTest {
 
         PatientPutRequest validPatientPutRequest = PatientCreator.createValidPatientPutRequest();
 
-        assertThrows(PatientNotFoundException.class, () -> patientService.editPatientInfos(validPatientPutRequest));
+        assertThrows(PatientNotFoundException.class, () -> patientServiceImpl.editPatientInfos(validPatientPutRequest));
     }
 
     @Test
@@ -137,7 +138,7 @@ class PatientServiceTest {
         PatientPutRequest patientPutRequest = PatientCreator.createValidPatientPutRequest();
         patientPutRequest.setName(Optional.of("New Name"));
 
-        patientService.editPatientInfos(patientPutRequest);
+        patientServiceImpl.editPatientInfos(patientPutRequest);
 
         verify(patientRepository).save(patientModelCaptor.capture());
         assertEquals("New Name", patientModelCaptor.getValue().getName());}
@@ -152,7 +153,7 @@ class PatientServiceTest {
 
         patientPutRequest.setBirthDate(Optional.of(LocalDate.now().minusYears(3)));
 
-        patientService.editPatientInfos(patientPutRequest);
+        patientServiceImpl.editPatientInfos(patientPutRequest);
 
         verify(patientRepository).save(patientModelCaptor.capture());
         assertNotEquals(LocalDate.now().minusYears(3), patientModelCaptor.getValue().getBirthDate());
@@ -165,7 +166,7 @@ class PatientServiceTest {
         when(patientRepository.findAllFiltered("John", "Doe", "12345678900", "john@example.com", pageRequest))
                 .thenReturn(mockedPage);
 
-        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+        Page<PatientGetRequest> result = patientServiceImpl.getPatientsFiltered(
                 Optional.of("John"), Optional.of("Doe"), Optional.of("12345678900"), Optional.of("john@example.com"), PageRequest.of(0, 10));
 
         assertNotNull(result);
@@ -181,7 +182,7 @@ class PatientServiceTest {
                 .thenReturn(mockedPage);
 
 
-        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+        Page<PatientGetRequest> result = patientServiceImpl.getPatientsFiltered(
                 Optional.of("John"), Optional.empty(), Optional.of("12345678900"), Optional.empty(), PageRequest.of(0, 10));
 
         assertNotNull(result);
@@ -196,7 +197,7 @@ class PatientServiceTest {
         when(patientRepository.findAllFiltered(null, null, null, null, pageRequest))
                 .thenReturn(mockedPage);
 
-        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+        Page<PatientGetRequest> result = patientServiceImpl.getPatientsFiltered(
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), PageRequest.of(0, 10));
 
         assertNotNull(result);
@@ -210,7 +211,7 @@ class PatientServiceTest {
         when(patientRepository.findAllFiltered(null, null, null, null, PageRequest.of(1, 5)))
                 .thenReturn(mockedPage);
 
-        Page<PatientGetRequest> result = patientService.getPatientsFiltered(
+        Page<PatientGetRequest> result = patientServiceImpl.getPatientsFiltered(
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), PageRequest.of(1, 5));
 
         assertNotNull(result);
