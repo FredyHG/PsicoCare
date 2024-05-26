@@ -6,6 +6,8 @@ import com.fredyhg.psicocare.security.models.UserModel;
 import com.fredyhg.psicocare.security.models.UserToken;
 import com.fredyhg.psicocare.security.repositories.UserModelRepository;
 import com.fredyhg.psicocare.security.repositories.UserTokenRepository;
+import com.fredyhg.psicocare.security.services.impl.JwtServiceImpl;
+import com.fredyhg.psicocare.security.services.impl.UserServiceImpl;
 import com.fredyhg.psicocare.services.impl.EmailSenderServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,10 +25,10 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class UserServiceImplTest {
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Mock
     private UserModelRepository userRepository;
@@ -35,7 +37,7 @@ class UserServiceTest {
     private UserTokenRepository tokenRepository;
 
     @Mock
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -52,12 +54,12 @@ class UserServiceTest {
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(UserModel.class))).thenReturn(savedUser);
-        when(jwtService.generateToken(savedUser)).thenReturn("jwtToken");
+        when(jwtServiceImpl.generateToken(savedUser)).thenReturn("jwtToken");
 
-        userService.createUser(psychologist);
+        userServiceImpl.createUser(psychologist);
 
         verify(userRepository).save(any(UserModel.class));
-        verify(jwtService).generateToken(savedUser);
+        verify(jwtServiceImpl).generateToken(savedUser);
         verify(emailSenderServiceImpl).sendAccessDetailsEmail(eq(psychologist), anyString());
     }
 
@@ -66,7 +68,7 @@ class UserServiceTest {
         UserModel user = new UserModel();
         String jwtToken = "jwtToken";
 
-        userService.saveUserToken(user, jwtToken);
+        userServiceImpl.saveUserToken(user, jwtToken);
 
         verify(tokenRepository).save(any(UserToken.class));
     }
@@ -77,7 +79,7 @@ class UserServiceTest {
         UserModel user = new UserModel();
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        UserModel result = userService.findByUsername(username);
+        UserModel result = userServiceImpl.findByUsername(username);
 
         assertEquals(user, result);
     }
@@ -87,12 +89,12 @@ class UserServiceTest {
         String username = "user@example.com";
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThrows(UserException.class, () -> userService.ensureUserExistsByUsername(username));
+        assertThrows(UserException.class, () -> userServiceImpl.ensureUserExistsByUsername(username));
     }
 
     @Test
     void passwordGeneratorTest() {
-        String password = userService.passwordGenerator();
+        String password = userServiceImpl.passwordGenerator();
 
         assertEquals(8, password.length());
         assertTrue(password.matches("[A-Za-z0-9]+"));

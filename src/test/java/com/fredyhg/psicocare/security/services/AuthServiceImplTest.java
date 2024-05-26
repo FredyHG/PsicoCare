@@ -5,7 +5,9 @@ import com.fredyhg.psicocare.security.models.UserModel;
 import com.fredyhg.psicocare.security.models.dto.AuthenticationDTO;
 import com.fredyhg.psicocare.security.repositories.UserModelRepository;
 import com.fredyhg.psicocare.security.repositories.UserTokenRepository;
-import jakarta.servlet.ServletOutputStream;
+import com.fredyhg.psicocare.security.services.impl.AuthServiceImpl;
+import com.fredyhg.psicocare.security.services.impl.JwtServiceImpl;
+import com.fredyhg.psicocare.security.services.impl.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -16,27 +18,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AuthServiceTest {
+class AuthServiceImplTest {
 
     @Mock
     private UserModelRepository userModelRepository;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Mock
     private UserTokenRepository userTokenRepository;
 
     @Mock
-    private JwtService jwtService;
+    private JwtServiceImpl jwtServiceImpl;
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -48,22 +48,22 @@ class AuthServiceTest {
     private HttpServletResponse response;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     @Test
     void authenticateSuccess() {
         AuthenticationDTO authenticationDTO = new AuthenticationDTO("user@example.com", "password");
         UserModel user = new UserModel();
         when(userModelRepository.findByUsername(authenticationDTO.getEmail())).thenReturn(Optional.of(user));
-        when(jwtService.generateToken(user)).thenReturn("jwtToken");
-        when(jwtService.generateRefreshTokenToken(user)).thenReturn("refreshToken");
+        when(jwtServiceImpl.generateToken(user)).thenReturn("jwtToken");
+        when(jwtServiceImpl.generateRefreshTokenToken(user)).thenReturn("refreshToken");
 
-        AuthenticationResponse response = authService.authenticate(authenticationDTO);
+        AuthenticationResponse response = authServiceImpl.authenticate(authenticationDTO);
 
         assertNotNull(response);
         assertEquals("jwtToken", response.getAccessToken());
         assertEquals("refreshToken", response.getRefreshToken());
-        verify(userService).saveUserToken(user, "jwtToken");
+        verify(userServiceImpl).saveUserToken(user, "jwtToken");
     }
 
     @Test
@@ -72,13 +72,13 @@ class AuthServiceTest {
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer validRefreshToken");
         UserModel user = new UserModel();
 
-        when(jwtService.extractUsername("validRefreshToken")).thenReturn("user@example.com");
-        when(userService.findByUsername("user@example.com")).thenReturn(user);
-        when(jwtService.isTokenValid("validRefreshToken", user)).thenReturn(true);
-        when(jwtService.generateToken(user)).thenReturn("newAccessToken");
+        when(jwtServiceImpl.extractUsername("validRefreshToken")).thenReturn("user@example.com");
+        when(userServiceImpl.findByUsername("user@example.com")).thenReturn(user);
+        when(jwtServiceImpl.isTokenValid("validRefreshToken", user)).thenReturn(true);
+        when(jwtServiceImpl.generateToken(user)).thenReturn("newAccessToken");
 
 
-        AuthenticationResponse authenticationResponse = authService.refreshToken(request, response);
+        AuthenticationResponse authenticationResponse = authServiceImpl.refreshToken(request, response);
 
         assertEquals("validRefreshToken", authenticationResponse.getRefreshToken() );
 

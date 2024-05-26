@@ -5,7 +5,7 @@ import com.fredyhg.psicocare.exceptions.utils.ResponseMessage;
 import com.fredyhg.psicocare.models.dtos.auth.ChangePasswordPostRequest;
 import com.fredyhg.psicocare.security.models.AuthenticationResponse;
 import com.fredyhg.psicocare.security.models.dto.AuthenticationDTO;
-import com.fredyhg.psicocare.security.services.AuthService;
+import com.fredyhg.psicocare.security.services.impl.AuthServiceImpl;
 import com.fredyhg.psicocare.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,18 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
 public class AuthControllerImpl implements AuthController {
-    private final AuthService authService;
+    private final AuthServiceImpl authServiceImpl;
 
     @PostMapping("/authenticate")
     @Override
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationDTO authenticationDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(authService.authenticate(authenticationDto));
+        return ResponseEntity.status(HttpStatus.OK).body(authServiceImpl.authenticate(authenticationDto));
     }
 
     @PostMapping("/refresh-token")
     @Override
     public ResponseEntity<AuthenticationResponse> refreshToken(HttpServletRequest request, HttpServletResponse response){
-        return ResponseEntity.status(HttpStatus.OK).body(authService.refreshToken(request, response));
+        return ResponseEntity.status(HttpStatus.OK).body(authServiceImpl.refreshToken(request, response));
     }
 
     @PostMapping("/check-login")
@@ -43,7 +43,7 @@ public class AuthControllerImpl implements AuthController {
     @PostMapping("/change-password")
     public ResponseEntity<ResponseMessage> changePassword(@RequestBody ChangePasswordPostRequest changePasswordPostRequest, HttpServletRequest httpServletRequest){
 
-        authService.changePassword(changePasswordPostRequest, httpServletRequest);
+        authServiceImpl.changePassword(changePasswordPostRequest, httpServletRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(Utils.createResponseMessage(
                 200,

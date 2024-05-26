@@ -3,7 +3,7 @@ package com.fredyhg.psicocare.security.configs;
 import com.fredyhg.psicocare.exceptions.security.AuthenticationException;
 import com.fredyhg.psicocare.exceptions.security.WriterException;
 import com.fredyhg.psicocare.security.repositories.UserTokenRepository;
-import com.fredyhg.psicocare.security.services.JwtService;
+import com.fredyhg.psicocare.security.services.impl.JwtServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,7 +26,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
 
     private final UserDetailsService userDetailsService;
 
@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             String jwt = extractJwt(authHeader);
-            String username = jwtService.extractUsername(jwt);
+            String username = jwtServiceImpl.extractUsername(jwt);
 
             if (username != null && isUserNotAuthenticated()) {
                 processAuthentication(request, jwt, username);
@@ -88,7 +88,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isTokenValid(String jwt, UserDetails userDetails) {
-        return jwtService.isTokenValid(jwt, userDetails) &&
+        return jwtServiceImpl.isTokenValid(jwt, userDetails) &&
                 tokenRepository.findByToken(jwt)
                         .map(t -> !t.isExpired() && !t.isRevoked())
                         .orElse(false);

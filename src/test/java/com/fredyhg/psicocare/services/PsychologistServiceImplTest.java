@@ -5,7 +5,7 @@ import com.fredyhg.psicocare.exceptions.psychologist.PsychologistNotFoundExcepti
 import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistGetRequest;
 import com.fredyhg.psicocare.repositories.PsychologistRepository;
-import com.fredyhg.psicocare.security.services.UserService;
+import com.fredyhg.psicocare.security.services.impl.UserServiceImpl;
 import com.fredyhg.psicocare.services.impl.PsychologistServiceImpl;
 import com.fredyhg.psicocare.utils.PsychologistCreator;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class PsychologistServiceImplTest {
     private PsychologistRepository psychologistRepository;
 
     @Mock
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @InjectMocks
     private PsychologistServiceImpl psychologistServiceImpl;

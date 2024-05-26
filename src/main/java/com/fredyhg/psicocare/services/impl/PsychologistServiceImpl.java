@@ -6,8 +6,8 @@ import com.fredyhg.psicocare.models.PsychologistModel;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistGetRequest;
 import com.fredyhg.psicocare.models.dtos.psychologist.PsychologistPostRequest;
 import com.fredyhg.psicocare.repositories.PsychologistRepository;
-import com.fredyhg.psicocare.security.services.JwtService;
-import com.fredyhg.psicocare.security.services.UserService;
+import com.fredyhg.psicocare.security.services.impl.JwtServiceImpl;
+import com.fredyhg.psicocare.security.services.impl.UserServiceImpl;
 import com.fredyhg.psicocare.services.PsychologistService;
 import com.fredyhg.psicocare.utils.ModelMappers;
 import jakarta.transaction.Transactional;
@@ -26,9 +26,9 @@ public class PsychologistServiceImpl implements PsychologistService {
 
     private final PsychologistRepository psychologistRepository;
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtServiceImpl;
 
     @Transactional
     public void createPsychologist(PsychologistPostRequest psychologistPostRequest) {
@@ -39,7 +39,7 @@ public class PsychologistServiceImpl implements PsychologistService {
 
         PsychologistModel psychologistSaved = psychologistRepository.save(psychologist);
 
-        userService.createUser(psychologistSaved);
+        userServiceImpl.createUser(psychologistSaved);
     }
 
     public PsychologistModel ensurePsychologistByCrpExists(String crp) {
@@ -75,7 +75,7 @@ public class PsychologistServiceImpl implements PsychologistService {
 
     public PsychologistGetRequest getPsychologistFromToken(String token) {
 
-        String email = jwtService.extractUsername(token);
+        String email = jwtServiceImpl.extractUsername(token);
 
         PsychologistModel psychologistsByEmail = getPsychologistsByEmail(email);
 
